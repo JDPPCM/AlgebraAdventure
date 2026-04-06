@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Algebra Adventure 🚀</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sky: #1a1a3e;
+  --star: #f9e784;
+  --purple: #7c3aed;
+  --pink: #ec4899;
+  --teal: #06b6d4;
+  --green: #22c55e;
+  --orange: #f97316;
+  --red: #ef4444;
+  --card: rgba(255,255,255,0.07);
+  --card-border: rgba(255,255,255,0.15);
+  --text: #f0f0ff;
+  --muted: #a0a0c0;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--sky);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── STAR FIELD ── */
+#stars { position:fixed; inset:0; pointer-events:none; z-index:0; }
+.star {
+  position:absolute;
+  border-radius:50%;
+  background:#fff;
+  animation: twinkle var(--d, 3s) ease-in-out infinite alternate;
+}
+@keyframes twinkle { from{opacity:.2} to{opacity:1} }
+
+/* ── FLOATING PLANETS ── */
+.planet {
+  position:fixed;
+  border-radius:50%;
+  pointer-events:none;
+  z-index:0;
+  animation: float var(--ft,8s) ease-in-out infinite alternate;
+}
+@keyframes float { from{transform:translateY(0)} to{transform:translateY(-20px)} }
+
+/* ── LAYOUT ── */
+#app { position:relative; z-index:1; }
+
+.screen { display:none; min-height:100vh; padding:20px; }
+.screen.active { display:flex; flex-direction:column; align-items:center; }
+
+/* ── HEADER ── */
+.logo {
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(2.2rem,6vw,3.5rem);
+  background: linear-gradient(135deg,var(--star),var(--pink),var(--teal));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  text-align:center;
+  margin-bottom:6px;
+  filter: drop-shadow(0 0 20px rgba(249,231,132,.4));
+}
+.tagline { color:var(--muted); font-size:1rem; text-align:center; margin-bottom:24px; }
+
+/* ── PROGRESS BAR ── */
+#progress-bar-wrap {
+  width:100%; max-width:680px;
+  background:rgba(255,255,255,.08);
+  border-radius:30px;
+  height:14px;
+  margin-bottom:24px;
+  overflow:hidden;
+  border:1px solid var(--card-border);
+}
+#progress-bar {
+  height:100%;
+  border-radius:30px;
+  background:linear-gradient(90deg,var(--purple),var(--pink),var(--teal));
+  transition:width .6s ease;
+  position:relative;
+}
+#progress-bar::after {
+  content:'';
+  position:absolute;
+  right:0; top:0; bottom:0;
+  width:20px;
+  background:rgba(255,255,255,.4);
+  border-radius:50%;
+  filter:blur(4px);
+}
+
+/* ── LEVEL BADGE ── */
+#level-badge {
+  font-family:'Fredoka One',cursive;
+  font-size:.9rem;
+  color:var(--star);
+  background:rgba(249,231,132,.15);
+  border:1px solid rgba(249,231,132,.3);
+  padding:4px 16px;
+  border-radius:30px;
+  margin-bottom:20px;
+  letter-spacing:.5px;
+}
+
+/* ── CARD ── */
+.card {
+  background:var(--card);
+  border:1px solid var(--card-border);
+  border-radius:24px;
+  padding:28px 32px;
+  width:100%;
+  max-width:680px;
+  backdrop-filter:blur(12px);
+  margin-bottom:20px;
+  animation:cardIn .5s ease both;
+}
+@keyframes cardIn { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+
+.card h2 {
+  font-family:'Fredoka One',cursive;
+  font-size:1.5rem;
+  margin-bottom:12px;
+  color:var(--teal);
+}
+.card p { line-height:1.75; color:#d0d0ee; font-size:1.02rem; }
+
+.highlight {
+  display:inline-block;
+  background:linear-gradient(135deg,rgba(124,58,237,.4),rgba(236,72,153,.3));
+  border:1px solid rgba(236,72,153,.4);
+  border-radius:10px;
+  padding:2px 10px;
+  font-weight:700;
+  color:#fff;
+  margin:2px;
+}
+
+/* ── BIG EQUATION DISPLAY ── */
+.equation-box {
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(1.8rem,5vw,2.6rem);
+  text-align:center;
+  background:linear-gradient(135deg,rgba(6,182,212,.15),rgba(124,58,237,.15));
+  border:2px solid rgba(6,182,212,.35);
+  border-radius:16px;
+  padding:18px;
+  margin:16px 0;
+  color:#fff;
+  letter-spacing:1px;
+}
+
+/* ── BUTTONS ── */
+.btn {
+  font-family:'Fredoka One',cursive;
+  font-size:1.1rem;
+  padding:13px 32px;
+  border:none;
+  border-radius:50px;
+  cursor:pointer;
+  transition:all .2s;
+  letter-spacing:.5px;
+  position:relative;
+  overflow:hidden;
+}
+.btn::after {
+  content:'';
+  position:absolute;
+  inset:0;
+  background:rgba(255,255,255,.15);
+  opacity:0;
+  transition:opacity .2s;
+}
+.btn:hover::after { opacity:1; }
+.btn:active { transform:scale(.96); }
+.btn-primary {
+  background:linear-gradient(135deg,var(--purple),var(--pink));
+  color:#fff;
+  box-shadow:0 4px 20px rgba(124,58,237,.45);
+}
+.btn-success {
+  background:linear-gradient(135deg,#16a34a,#22c55e);
+  color:#fff;
+  box-shadow:0 4px 20px rgba(34,197,94,.35);
+}
+.btn-teal {
+  background:linear-gradient(135deg,#0891b2,var(--teal));
+  color:#fff;
+  box-shadow:0 4px 20px rgba(6,182,212,.35);
+}
+.btn-row { display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-top:16px; }
+
+/* ── ANSWER OPTIONS ── */
+.options-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin:16px 0;
+}
+.opt-btn {
+  font-family:'Fredoka One',cursive;
+  font-size:1.3rem;
+  padding:18px;
+  border:2px solid var(--card-border);
+  border-radius:16px;
+  background:rgba(255,255,255,.06);
+  color:#fff;
+  cursor:pointer;
+  transition:all .2s;
+  text-align:center;
+}
+.opt-btn:hover { background:rgba(6,182,212,.2); border-color:var(--teal); transform:scale(1.03); }
+.opt-btn.correct { background:rgba(34,197,94,.25)!important; border-color:var(--green)!important; animation:pulse-green .4s ease; }
+.opt-btn.wrong   { background:rgba(239,68,68,.25)!important; border-color:var(--red)!important; animation:shake .3s ease; }
+
+@keyframes pulse-green { 0%{transform:scale(1)} 50%{transform:scale(1.08)} 100%{transform:scale(1)} }
+@keyframes shake { 0%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} 100%{transform:translateX(0)} }
+
+/* ── TEXT INPUT ── */
+.answer-input {
+  width:100%;
+  font-family:'Fredoka One',cursive;
+  font-size:1.5rem;
+  text-align:center;
+  padding:14px 20px;
+  border-radius:14px;
+  border:2px solid var(--card-border);
+  background:rgba(255,255,255,.07);
+  color:#fff;
+  outline:none;
+  transition:border-color .2s;
+  margin:12px 0;
+}
+.answer-input:focus { border-color:var(--teal); background:rgba(6,182,212,.1); }
+
+/* ── FEEDBACK BANNER ── */
+#feedback {
+  position:fixed;
+  top:20px; left:50%;
+  transform:translateX(-50%) translateY(-100px);
+  font-family:'Fredoka One',cursive;
+  font-size:1.2rem;
+  padding:14px 32px;
+  border-radius:50px;
+  z-index:999;
+  transition:transform .4s cubic-bezier(.34,1.56,.64,1);
+  white-space:nowrap;
+}
+#feedback.show { transform:translateX(-50%) translateY(0); }
+#feedback.correct-fb { background:linear-gradient(135deg,#16a34a,#22c55e); color:#fff; box-shadow:0 8px 30px rgba(34,197,94,.4); }
+#feedback.wrong-fb   { background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; box-shadow:0 8px 30px rgba(239,68,68,.4); }
+
+/* ── SCORE STARS ── */
+.stars-row { display:flex; gap:8px; justify-content:center; font-size:2.2rem; margin:12px 0; }
+.star-icon { opacity:.25; transition:all .4s; }
+.star-icon.lit { opacity:1; filter:drop-shadow(0 0 8px gold); animation:starPop .4s ease; }
+@keyframes starPop { 0%{transform:scale(0)} 60%{transform:scale(1.3)} 100%{transform:scale(1)} }
+
+/* ── QUIZ PROGRESS ── */
+.quiz-dots { display:flex; gap:8px; justify-content:center; margin-bottom:16px; }
+.quiz-dot { width:12px; height:12px; border-radius:50%; background:rgba(255,255,255,.2); transition:all .3s; }
+.quiz-dot.done { background:var(--green); }
+.quiz-dot.active { background:var(--teal); transform:scale(1.3); }
+.quiz-dot.wrong { background:var(--red); }
+
+/* ── CANDY CRUSH GAME ── */
+#crush-board {
+  display:grid;
+  gap:4px;
+  margin:16px auto;
+  width:fit-content;
+}
+.crush-cell {
+  width:52px; height:52px;
+  border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.6rem;
+  cursor:pointer;
+  transition:all .2s;
+  border:2px solid transparent;
+  user-select:none;
+}
+.crush-cell:hover { transform:scale(1.1); filter:brightness(1.2); }
+.crush-cell.selected { border-color:#fff; transform:scale(1.1); box-shadow:0 0 14px rgba(255,255,255,.5); }
+.crush-cell.matched {
+  animation:matchPop .35s ease forwards;
+}
+@keyframes matchPop {
+  0%{transform:scale(1)} 50%{transform:scale(1.3);filter:brightness(2)} 100%{transform:scale(0);opacity:0}
+}
+
+.crush-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.crush-score-box {
+  font-family:'Fredoka One',cursive;
+  font-size:1.2rem;
+  background:rgba(249,231,132,.15);
+  border:1px solid rgba(249,231,132,.3);
+  padding:6px 18px;
+  border-radius:30px;
+  color:var(--star);
+}
+.moves-box {
+  font-family:'Fredoka One',cursive;
+  font-size:1.1rem;
+  color:var(--teal);
+  background:rgba(6,182,212,.1);
+  border:1px solid rgba(6,182,212,.25);
+  padding:6px 16px;
+  border-radius:30px;
+}
+
+/* ── HOME SCREEN ── */
+.hero-icon { font-size:clamp(4rem,12vw,7rem); margin:16px 0; animation:bounce 2s ease-in-out infinite; }
+@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-15px)} }
+
+.level-cards {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:16px;
+  width:100%;
+  max-width:680px;
+  margin:16px 0;
+}
+.level-card {
+  border-radius:20px;
+  padding:20px 16px;
+  text-align:center;
+  cursor:pointer;
+  transition:all .25s;
+  border:2px solid transparent;
+  position:relative;
+  overflow:hidden;
+}
+.level-card:hover { transform:translateY(-6px) scale(1.02); }
+.level-card.locked { opacity:.5; cursor:not-allowed; filter:grayscale(.6); }
+.level-card.locked::after {
+  content:'🔒';
+  position:absolute;
+  top:8px; right:10px;
+  font-size:1.2rem;
+}
+.level-card .lc-icon { font-size:2.5rem; margin-bottom:8px; }
+.level-card h3 { font-family:'Fredoka One',cursive; font-size:1.1rem; margin-bottom:4px; }
+.level-card p { font-size:.8rem; color:var(--muted); }
+
+.lc-1 { background:linear-gradient(135deg,rgba(124,58,237,.35),rgba(236,72,153,.25)); border-color:rgba(124,58,237,.4); }
+.lc-2 { background:linear-gradient(135deg,rgba(6,182,212,.3),rgba(16,185,129,.25)); border-color:rgba(6,182,212,.4); }
+.lc-3 { background:linear-gradient(135deg,rgba(249,115,22,.3),rgba(249,231,132,.2)); border-color:rgba(249,115,22,.4); }
+
+/* ── CONFETTI ── */
+.confetti-piece {
+  position:fixed;
+  width:10px; height:10px;
+  pointer-events:none;
+  z-index:9999;
+  animation:confettiFall var(--cd,2.5s) ease-in forwards;
+}
+@keyframes confettiFall {
+  0%{transform:translate(0,0) rotate(0deg);opacity:1}
+  100%{transform:translate(var(--cx,0),var(--cy,400px)) rotate(720deg);opacity:0}
+}
+
+/* ── CONCEPT VISUAL ── */
+.visual-box {
+  background:linear-gradient(135deg,rgba(6,182,212,.1),rgba(124,58,237,.1));
+  border:1px solid rgba(6,182,212,.3);
+  border-radius:16px;
+  padding:20px;
+  margin:14px 0;
+  text-align:center;
+}
+.var-demo { display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap; margin:10px 0; }
+.box-var {
+  width:56px; height:56px;
+  border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Fredoka One',cursive;
+  font-size:1.4rem;
+  animation:varPulse 2s ease-in-out infinite alternate;
+}
+@keyframes varPulse { from{transform:scale(1)} to{transform:scale(1.08)} }
+.box-x { background:linear-gradient(135deg,var(--purple),var(--pink)); }
+.box-num { background:linear-gradient(135deg,var(--teal),#0e7490); }
+.op { font-size:1.5rem; font-weight:800; color:var(--star); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:500px) {
+  .card { padding:18px 16px; }
+  .options-grid { grid-template-columns:1fr 1fr; }
+  .crush-cell { width:42px; height:42px; font-size:1.3rem; }
+}
+
+/* ── EXPLANATION PANEL ── */
+.explain-panel {
+  background:linear-gradient(135deg,rgba(239,68,68,.12),rgba(249,115,22,.1));
+  border:1px solid rgba(239,68,68,.35);
+  border-radius:16px;
+  padding:18px 20px;
+  margin:14px 0 8px;
+  line-height:1.7;
+  font-size:.97rem;
+  color:#f0d0d0;
+  animation:cardIn .4s ease both;
+}
+.explain-panel .concept-recap {
+  background:rgba(6,182,212,.1);
+  border:1px solid rgba(6,182,212,.25);
+  border-radius:12px;
+  padding:12px 16px;
+  margin-top:12px;
+  color:#c0e8f0;
+}
+.retry-banner {
+  background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(236,72,153,.15));
+  border:1px solid rgba(236,72,153,.35);
+  border-radius:14px;
+  padding:12px 16px;
+  margin-top:12px;
+  text-align:center;
+  font-family:'Fredoka One',cursive;
+  font-size:1.05rem;
+  color:#f0d0ff;
+}
+
+/* ── QUIZ PAUSE MODAL ── */
+#quiz-pause-modal {
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(10,10,30,.85);
+  z-index:500;
+  align-items:center;
+  justify-content:center;
+}
+#quiz-pause-modal.show { display:flex; }
+.pause-box {
+  background:linear-gradient(135deg,#1e1e4e,#2a1a4e);
+  border:1px solid rgba(124,58,237,.5);
+  border-radius:28px;
+  padding:40px 36px;
+  text-align:center;
+  max-width:380px;
+  width:90%;
+  box-shadow:0 20px 60px rgba(0,0,0,.6);
+  animation:cardIn .4s ease;
+}
+.pause-box h2 { font-family:'Fredoka One',cursive; font-size:1.8rem; color:var(--star); margin-bottom:10px; }
+.pause-box p { color:var(--muted); margin-bottom:20px; }
+.quiz-progress-saved {
+  background:rgba(6,182,212,.1);
+  border:1px solid rgba(6,182,212,.3);
+  border-radius:12px;
+  padding:12px;
+  margin-bottom:20px;
+  font-family:'Fredoka One',cursive;
+  color:var(--teal);
+}
+
+/* ── QUIZ PAUSE BUTTON ── */
+.quiz-top-bar {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  width:100%;
+  max-width:680px;
+  margin-bottom:8px;
+}
+.btn-pause {
+  font-family:'Fredoka One',cursive;
+  font-size:.95rem;
+  padding:8px 18px;
+  border:1px solid rgba(255,255,255,.25);
+  border-radius:30px;
+  background:rgba(255,255,255,.07);
+  color:var(--muted);
+  cursor:pointer;
+  transition:all .2s;
+}
+.btn-pause:hover { background:rgba(255,255,255,.14); color:#fff; }
+</style>
+</head>
+<body>
+
+<!-- Background -->
+<div id="stars"></div>
+<div class="planet" style="width:120px;height:120px;background:radial-gradient(circle at 35% 35%,#7c3aed,#1a1a3e);top:5%;right:-40px;--ft:9s;opacity:.6"></div>
+<div class="planet" style="width:70px;height:70px;background:radial-gradient(circle at 35% 35%,#06b6d4,#0e4060);bottom:15%;left:-20px;--ft:11s;opacity:.5"></div>
+<div class="planet" style="width:40px;height:40px;background:radial-gradient(circle at 35% 35%,#ec4899,#6b1343);top:40%;right:5%;--ft:7s;opacity:.45"></div>
+
+<div id="feedback"></div>
+<div id="app">
+
+<!-- ════════════ HOME SCREEN ════════════ -->
+<div id="screen-home" class="screen active">
+  <div class="logo">Algebra Adventure 🚀</div>
+  <div class="tagline">Master algebra one star at a time!</div>
+
+  <div id="progress-bar-wrap"><div id="progress-bar" style="width:0%"></div></div>
+  <div id="level-badge">⭐ Total Stars: <span id="total-stars-home">0</span></div>
+
+  <div class="level-cards">
+    <div class="level-card lc-1" id="lc-1" onclick="startLevel(1)">
+      <div class="lc-icon">🔢</div>
+      <h3>Level 1</h3>
+      <p>Variables & Expressions</p>
+      <div id="lc1-stars" style="font-size:.9rem;margin-top:6px;color:#f9e784"></div>
+    </div>
+    <div class="level-card lc-2 locked" id="lc-2" onclick="startLevel(2)">
+      <div class="lc-icon">⚖️</div>
+      <h3>Level 2</h3>
+      <p>Solving Equations</p>
+      <div id="lc2-stars" style="font-size:.9rem;margin-top:6px;color:#f9e784"></div>
+    </div>
+    <div class="level-card lc-3 locked" id="lc-3" onclick="startLevel(3)">
+      <div class="lc-icon">🧮</div>
+      <h3>Level 3</h3>
+      <p>Two-step Equations</p>
+      <div id="lc3-stars" style="font-size:.9rem;margin-top:6px;color:#f9e784"></div>
+    </div>
+  </div>
+
+  <div class="hero-icon">🚀</div>
+</div>
+
+<!-- ════════════ LEARN SCREEN ════════════ -->
+<div id="screen-learn" class="screen">
+  <div class="logo" id="learn-title">Level 1</div>
+  <div id="learn-content"></div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="showExamples()">Practice Examples ➜</button>
+  </div>
+</div>
+
+<!-- ════════════ PRACTICE SCREEN ════════════ -->
+<div id="screen-practice" class="screen">
+  <div class="logo" style="font-size:2rem" id="practice-title">Practice Time!</div>
+  <div id="practice-content"></div>
+</div>
+
+<!-- ════════════ QUIZ PAUSE MODAL ════════════ -->
+<div id="quiz-pause-modal">
+  <div class="pause-box">
+    <h2>⏸️ Quiz Paused</h2>
+    <p>No worries — your progress is saved! Come back anytime.</p>
+    <div class="quiz-progress-saved" id="pause-progress-text">Question 1 of 5 • 0 correct so far</div>
+    <div class="btn-row" style="flex-direction:column;gap:10px">
+      <button class="btn btn-primary" onclick="resumeQuiz()">▶️ Resume Quiz</button>
+      <button class="btn btn-teal" onclick="pauseGoReview()">📖 Review Lesson</button>
+      <button class="btn" style="background:rgba(255,255,255,.08);color:var(--muted)" onclick="pauseGoHome()">🏠 Go Home</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ QUIZ SCREEN ════════════ -->
+<div id="screen-quiz" class="screen">
+  <div class="quiz-top-bar">
+    <div class="logo" style="font-size:1.8rem;margin:0">🎯 Quiz Time!</div>
+    <button class="btn-pause" onclick="pauseQuiz()">⏸ Pause</button>
+  </div>
+  <div class="quiz-dots" id="quiz-dots"></div>
+  <div id="quiz-content"></div>
+</div>
+
+<!-- ════════════ CRUSH SCREEN ════════════ -->
+<div id="screen-crush" class="screen">
+  <div class="logo" style="font-size:2rem">🍬 Star Blast!</div>
+  <div class="tagline" id="crush-tagline">Match 3 to earn bonus stars!</div>
+  <div class="card" style="max-width:420px;padding:20px">
+    <div class="crush-header">
+      <div class="crush-score-box">⭐ <span id="crush-score">0</span></div>
+      <div class="moves-box">🎯 Moves: <span id="crush-moves">15</span></div>
+    </div>
+    <div id="crush-board"></div>
+    <div id="crush-msg" style="text-align:center;font-family:'Fredoka One',cursive;font-size:1.1rem;min-height:28px;color:var(--star)"></div>
+    <div class="btn-row" style="margin-top:12px">
+      <button class="btn btn-success" id="crush-continue" style="display:none" onclick="afterCrush()">Continue ➜</button>
+      <button class="btn btn-teal" onclick="afterCrush()">Skip Game</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ WIN SCREEN ════════════ -->
+<div id="screen-win" class="screen">
+  <div class="hero-icon" style="animation:none;font-size:5rem">🏆</div>
+  <div class="logo">Level Complete!</div>
+  <div class="stars-row" id="win-stars-row"></div>
+  <div class="card" style="text-align:center">
+    <p id="win-msg" style="font-size:1.1rem;margin-bottom:12px"></p>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="goHome()">🏠 Home</button>
+      <button class="btn btn-success" id="btn-next-level" onclick="goNextLevel()">Next Level ➜</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- #app -->
+
+<script>
+/* ═══════════════════════════════════════
+   STATE
+════════════════════════════════════════*/
+const state = {
+  currentLevel: 1,
+  unlockedLevels: [1],
+  levelStars: {1:0,2:0,3:0},
+  practiceProbIdx: 0,
+  quizIdx: 0,
+  quizCorrect: 0,
+  quizWrong: [],
+  crushScore: 0,
+};
+
+/* ═══════════════════════════════════════
+   CURRICULUM
+════════════════════════════════════════*/
+const curriculum = {
+  1: {
+    title: "Variables & Expressions",
+    icon: "🔢",
+    learn: [
+      {
+        title: "🔮 What is a Variable?",
+        body: `A <strong>variable</strong> is a letter that stands for an <em>unknown</em> number — like a mystery box that could hold any value! We use letters like <span class="highlight">x</span>, <span class="highlight">y</span>, <span class="highlight">n</span>, or <span class="highlight">a</span>.<br><br>
+        🌟 <strong>Real-life example:</strong> Imagine you have some sweets in a bag and you don't know how many. We could call that number <span class="highlight">x</span>. Once you count them, you know what x is!`,
+        visual: `<div class="visual-box">
+          <div class="var-demo">
+            <div class="box-var box-x">x</div>
+            <div class="op">=</div>
+            <div class="box-var box-num">?</div>
+          </div>
+          <p style="color:var(--muted);font-size:.9rem;margin-top:8px">x could be 3, 7, 15 — it's a mystery until we solve it!</p>
+          <div style="margin-top:12px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+            <span style="background:rgba(124,58,237,.3);padding:6px 14px;border-radius:10px;font-size:.95rem">🍬 sweets in bag = x</span>
+            <span style="background:rgba(6,182,212,.25);padding:6px 14px;border-radius:10px;font-size:.95rem">🚗 cars in car park = n</span>
+          </div>
+        </div>`
+      },
+      {
+        title: "🔢 Variables, Coefficients & Constants",
+        body: `Every algebraic expression has three kinds of parts. Let's look at <span class="highlight">3x + 5</span> carefully:<br><br>
+        <strong style="color:#a78bfa">📌 Variable</strong> — the letter. Here it's <span class="highlight">x</span>. It represents the unknown number.<br><br>
+        <strong style="color:#34d399">📌 Coefficient</strong> — the number <em>in front of</em> the variable that multiplies it. Here it's <span class="highlight">3</span>. So 3x means "3 times x".<br><br>
+        <strong style="color:#fb923c">📌 Constant</strong> — a plain number on its own that never changes. Here it's <span class="highlight">5</span>. It stays 5 no matter what x is.`,
+        visual: `<div class="visual-box">
+          <div class="equation-box" style="font-size:2rem;letter-spacing:4px">
+            <span style="color:#a78bfa">3</span><span style="color:#f472b6">x</span><span style="color:#fff"> + </span><span style="color:#fb923c">5</span>
+          </div>
+          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px">
+            <div style="background:rgba(167,139,250,.2);border:1px solid rgba(167,139,250,.5);border-radius:12px;padding:10px 16px;text-align:center">
+              <div style="font-size:1.4rem;font-weight:800;color:#a78bfa">3</div>
+              <div style="font-size:.8rem;color:var(--muted)">Coefficient</div>
+              <div style="font-size:.75rem;color:var(--muted)">(multiplies x)</div>
+            </div>
+            <div style="background:rgba(244,114,182,.2);border:1px solid rgba(244,114,182,.5);border-radius:12px;padding:10px 16px;text-align:center">
+              <div style="font-size:1.4rem;font-weight:800;color:#f472b6">x</div>
+              <div style="font-size:.8rem;color:var(--muted)">Variable</div>
+              <div style="font-size:.75rem;color:var(--muted)">(the unknown)</div>
+            </div>
+            <div style="background:rgba(251,146,60,.2);border:1px solid rgba(251,146,60,.5);border-radius:12px;padding:10px 16px;text-align:center">
+              <div style="font-size:1.4rem;font-weight:800;color:#fb923c">5</div>
+              <div style="font-size:.8rem;color:var(--muted)">Constant</div>
+              <div style="font-size:.75rem;color:var(--muted)">(never changes)</div>
+            </div>
+          </div>
+        </div>`
+      },
+      {
+        title: "🧪 What is an Expression?",
+        body: `An <strong>algebraic expression</strong> combines variables, coefficients, and constants using +, −, ×, ÷.<br><br>
+        ⚠️ <strong>Key rule:</strong> An expression does <em>NOT</em> have an = sign. If it has an = sign, it's an <em>equation</em> (that comes next!)<br><br>
+        ✅ <strong>Expressions:</strong> <span class="highlight">3x + 5</span>, <span class="highlight">2y − 1</span>, <span class="highlight">n + 7</span><br>
+        ❌ <strong>NOT expressions:</strong> <span class="highlight">x = 4</span>, <span class="highlight">3n + 1 = 10</span>`,
+        visual: `<div class="visual-box">
+          <p style="color:var(--muted);margin-bottom:10px">Can you spot the coefficient, variable, and constant?</p>
+          <div class="equation-box" style="font-size:1.8rem"><span style="color:#a78bfa">4</span><span style="color:#f472b6">y</span> − <span style="color:#fb923c">2</span></div>
+          <div style="margin-top:10px;font-size:.95rem;color:var(--muted)">Coefficient = <strong style="color:#a78bfa">4</strong> &nbsp;|&nbsp; Variable = <strong style="color:#f472b6">y</strong> &nbsp;|&nbsp; Constant = <strong style="color:#fb923c">2</strong></div>
+        </div>`
+      },
+      {
+        title: "🎯 Evaluating Expressions",
+        body: `To <strong>evaluate</strong> an expression means to find its value when you know what the variable equals. Simply <em>replace</em> the variable with the number and then calculate step by step!`,
+        visual: `<div class="visual-box">
+          <p style="color:var(--muted);margin-bottom:8px">💡 If x = <strong style="color:#f472b6">4</strong>, what is 3x + 5?</p>
+          <div class="equation-box" style="font-size:1.3rem">Step 1: Replace x with 4 → 3 × <span style="color:#f472b6">4</span> + 5</div>
+          <div class="equation-box" style="font-size:1.3rem">Step 2: Multiply → <span style="color:#a78bfa">12</span> + 5</div>
+          <div class="equation-box" style="font-size:1.5rem;color:var(--star)">Step 3: Add → <strong>17</strong> ✅</div>
+        </div>`
+      }
+    ],
+    practice: [
+      { q:"If x = 3, what is 2x + 1?", ans:7, opts:[5,7,9,8], hint:"Replace x with 3: 2×3+1",
+        explanation:`<strong>Here's how to solve it step by step:</strong><br>
+        The expression is <strong>2x + 1</strong> and x = 3.<br>
+        • <strong>Step 1 — Replace x with 3:</strong> 2 × 3 + 1<br>
+        • <strong>Step 2 — Multiply first (coefficient × variable):</strong> 6 + 1<br>
+        • <strong>Step 3 — Add the constant:</strong> 6 + 1 = <strong style="color:var(--star)">7</strong><br><br>
+        Remember: 2x means the <em>coefficient</em> (2) times the <em>variable</em> (x). Always multiply before adding!` },
+      { q:"If n = 5, what is n + 4?", ans:9, opts:[9,10,6,1], hint:"Replace n with 5: 5+4",
+        explanation:`<strong>Here's how to solve it step by step:</strong><br>
+        The expression is <strong>n + 4</strong> and n = 5.<br>
+        • <strong>Step 1 — Replace n with 5:</strong> 5 + 4<br>
+        • <strong>Step 2 — Add:</strong> 5 + 4 = <strong style="color:var(--star)">9</strong><br><br>
+        Here the coefficient of n is 1 (invisible), so n just means 1 × n = n itself. Simple substitution!` },
+      { q:"If y = 2, what is 4y − 3?", ans:5, opts:[5,6,11,4], hint:"Replace y with 2: 4×2−3",
+        explanation:`<strong>Here's how to solve it step by step:</strong><br>
+        The expression is <strong>4y − 3</strong> and y = 2.<br>
+        • <strong>Step 1 — Replace y with 2:</strong> 4 × 2 − 3<br>
+        • <strong>Step 2 — Multiply (coefficient × variable):</strong> 8 − 3<br>
+        • <strong>Step 3 — Subtract the constant:</strong> 8 − 3 = <strong style="color:var(--star)">5</strong><br><br>
+        The <em>constant</em> (−3) never changes — it stays −3 whatever y is. Only the 4y part changes!` },
+      { q:"If x = 6, what is x ÷ 2 + 1?", ans:4, opts:[4,7,3,13], hint:"Replace x with 6: 6÷2+1",
+        explanation:`<strong>Here's how to solve it step by step:</strong><br>
+        The expression is <strong>x ÷ 2 + 1</strong> and x = 6.<br>
+        • <strong>Step 1 — Replace x with 6:</strong> 6 ÷ 2 + 1<br>
+        • <strong>Step 2 — Divide first (order of operations):</strong> 3 + 1<br>
+        • <strong>Step 3 — Add:</strong> 3 + 1 = <strong style="color:var(--star)">4</strong><br><br>
+        Important: always do multiplication and division BEFORE addition and subtraction!` },
+      { q:"If a = 10, what is 3a − 5?", ans:25, opts:[25,30,15,35], hint:"Replace a with 10: 3×10−5",
+        explanation:`<strong>Here's how to solve it step by step:</strong><br>
+        The expression is <strong>3a − 5</strong> and a = 10.<br>
+        • <strong>Step 1 — Replace a with 10:</strong> 3 × 10 − 5<br>
+        • <strong>Step 2 — Multiply (coefficient × variable):</strong> 30 − 5<br>
+        • <strong>Step 3 — Subtract the constant:</strong> 30 − 5 = <strong style="color:var(--star)">25</strong><br><br>
+        The coefficient (3) multiplies a, giving 3 × 10 = 30. Then we subtract the constant (5).` },
+    ],
+    quiz: [
+      { q:"Which of these is an expression (no = sign)?", ans:"5x + 3", opts:["5x + 3","x = 7","2 = 2","y + 1 = 4"] },
+      { q:"If x = 4, what is 2x + 3?", ans:11, opts:[9,10,11,12] },
+      { q:"If n = 0, what is 5n + 8?", ans:8, opts:[0,5,8,13] },
+      { q:"Which letter is a variable in: 7y − 2?", ans:"y", opts:["7","y","2","−"] },
+      { q:"If x = 3, what is x² (x times x)?", ans:9, opts:[6,9,8,12] },
+    ]
+  },
+  2: {
+    title: "Solving Equations",
+    icon: "⚖️",
+    learn: [
+      {
+        title: "⚖️ What is an Equation?",
+        body: `An <strong>equation</strong> is like a perfectly balanced scale — both sides must always be <em>equal</em>. It has an <span class="highlight">=</span> sign in the middle.<br><br>
+        🌟 <strong>The big difference from expressions:</strong><br>
+        • <strong>Expression:</strong> <span class="highlight">3x + 5</span> — no = sign, just a combination<br>
+        • <strong>Equation:</strong> <span class="highlight">3x + 5 = 11</span> — has = sign, two sides that must balance<br><br>
+        Our job is to figure out what value of x makes both sides equal!`,
+        visual: `<div class="visual-box">
+          <div style="display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap">
+            <div style="background:rgba(124,58,237,.25);border:1px solid rgba(124,58,237,.4);border-radius:14px;padding:14px 20px;text-align:center">
+              <div style="font-family:'Fredoka One',cursive;font-size:1.4rem">x + 3</div>
+              <div style="font-size:.8rem;color:var(--muted);margin-top:4px">Left side</div>
+            </div>
+            <div style="font-size:2rem;color:var(--star)">⚖️</div>
+            <div style="background:rgba(6,182,212,.2);border:1px solid rgba(6,182,212,.4);border-radius:14px;padding:14px 20px;text-align:center">
+              <div style="font-family:'Fredoka One',cursive;font-size:1.4rem">7</div>
+              <div style="font-size:.8rem;color:var(--muted);margin-top:4px">Right side</div>
+            </div>
+          </div>
+          <p style="color:var(--muted);font-size:.9rem;margin-top:12px">What is x? If x = 4, then 4+3 = 7 ✅ The scale balances!</p>
+        </div>`
+      },
+      {
+        title: "🔑 The Golden Rule of Equations",
+        body: `<strong>Whatever you do to one side, you MUST do to the other side!</strong><br><br>
+        This is the most important rule in algebra. If you add, subtract, multiply, or divide on one side, you have to do exactly the same thing on the other side — otherwise the scale tips and the equation breaks!<br><br>
+        Our goal is always to get the <strong>variable alone</strong> on one side (called "isolating" the variable).`,
+        visual: `<div class="visual-box">
+          <p style="color:var(--muted);margin-bottom:10px">Solving x + 3 = 7 — subtract 3 from BOTH sides:</p>
+          <div class="equation-box" style="font-size:1.2rem">
+            x + 3 <span style="color:var(--star)">&nbsp;=&nbsp;</span> 7<br>
+            <span style="color:#f472b6">− 3</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#f472b6">− 3</span><br>
+            <span style="border-top:2px solid rgba(255,255,255,.3);padding-top:8px;display:inline-block">x <span style="color:var(--star)">&nbsp;=&nbsp;</span> <span style="color:var(--green)">4 ✅</span></span>
+          </div>
+        </div>`
+      },
+      {
+        title: "🔄 Inverse Operations",
+        body: `To <em>undo</em> what's been done to x, use the <strong>opposite (inverse) operation</strong>:<br><br>
+        ➕ Addition is undone by ➖ Subtraction<br>
+        ➖ Subtraction is undone by ➕ Addition<br>
+        ✖️ Multiplication is undone by ➗ Division<br>
+        ➗ Division is undone by ✖️ Multiplication<br><br>
+        Think of it like putting your shoes on — to undo it, you take them off!`,
+        visual: `<div class="visual-box">
+          <div class="var-demo" style="gap:20px">
+            <div style="text-align:center;background:rgba(124,58,237,.2);border-radius:14px;padding:12px 16px">
+              <div style="font-size:1.3rem;margin-bottom:6px">x <strong>+ 5</strong> = 12</div>
+              <div style="color:#f472b6;font-size:.9rem">→ subtract 5</div>
+              <div style="font-size:1.1rem;margin-top:6px;color:var(--green)">x = 7 ✅</div>
+            </div>
+            <div style="text-align:center;background:rgba(6,182,212,.2);border-radius:14px;padding:12px 16px">
+              <div style="font-size:1.3rem;margin-bottom:6px"><strong>3</strong>x = 15</div>
+              <div style="color:#f472b6;font-size:.9rem">→ divide by 3</div>
+              <div style="font-size:1.1rem;margin-top:6px;color:var(--green)">x = 5 ✅</div>
+            </div>
+          </div>
+        </div>`
+      }
+    ],
+    practice: [
+      { q:"Solve: x + 5 = 12", ans:7, opts:[6,7,8,17], hint:"Subtract 5 from both sides",
+        explanation:`<strong>How to solve x + 5 = 12:</strong><br>
+        x has had 5 <em>added</em> to it, so we <em>subtract</em> 5 from both sides (inverse operation).<br>
+        • Left side: x + 5 − 5 = x<br>
+        • Right side: 12 − 5 = 7<br>
+        • Result: <strong style="color:var(--star)">x = 7 ✅</strong><br><br>
+        Check: 7 + 5 = 12 ✓ The scale balances!` },
+      { q:"Solve: n − 3 = 9", ans:12, opts:[6,12,3,11], hint:"Add 3 to both sides",
+        explanation:`<strong>How to solve n − 3 = 9:</strong><br>
+        n has had 3 <em>subtracted</em>, so we <em>add</em> 3 to both sides.<br>
+        • Left side: n − 3 + 3 = n<br>
+        • Right side: 9 + 3 = 12<br>
+        • Result: <strong style="color:var(--star)">n = 12 ✅</strong><br><br>
+        Check: 12 − 3 = 9 ✓` },
+      { q:"Solve: 4x = 20", ans:5, opts:[4,5,16,24], hint:"Divide both sides by 4",
+        explanation:`<strong>How to solve 4x = 20:</strong><br>
+        x has been <em>multiplied</em> by 4, so we <em>divide</em> both sides by 4.<br>
+        • Left side: 4x ÷ 4 = x<br>
+        • Right side: 20 ÷ 4 = 5<br>
+        • Result: <strong style="color:var(--star)">x = 5 ✅</strong><br><br>
+        Check: 4 × 5 = 20 ✓` },
+      { q:"Solve: y ÷ 3 = 6", ans:18, opts:[2,9,18,3], hint:"Multiply both sides by 3",
+        explanation:`<strong>How to solve y ÷ 3 = 6:</strong><br>
+        y has been <em>divided</em> by 3, so we <em>multiply</em> both sides by 3.<br>
+        • Left side: (y ÷ 3) × 3 = y<br>
+        • Right side: 6 × 3 = 18<br>
+        • Result: <strong style="color:var(--star)">y = 18 ✅</strong><br><br>
+        Check: 18 ÷ 3 = 6 ✓` },
+      { q:"Solve: x + 11 = 20", ans:9, opts:[9,10,31,8], hint:"Subtract 11 from both sides",
+        explanation:`<strong>How to solve x + 11 = 20:</strong><br>
+        x has had 11 <em>added</em>, so we <em>subtract</em> 11 from both sides.<br>
+        • Left side: x + 11 − 11 = x<br>
+        • Right side: 20 − 11 = 9<br>
+        • Result: <strong style="color:var(--star)">x = 9 ✅</strong><br><br>
+        Check: 9 + 11 = 20 ✓` },
+    ],
+    quiz: [
+      { q:"Solve: x + 6 = 15", ans:9, opts:[7,8,9,21] },
+      { q:"Solve: y − 4 = 11", ans:15, opts:[7,14,15,44] },
+      { q:"Solve: 5n = 35", ans:7, opts:[6,7,30,40] },
+      { q:"Solve: x ÷ 4 = 8", ans:32, opts:[2,12,32,4] },
+      { q:"Solve: x + 3 = 3", ans:0, opts:[0,1,6,3] },
+    ]
+  },
+  3: {
+    title: "Two-Step Equations",
+    icon: "🧮",
+    learn: [
+      {
+        title: "🪜 Two Steps — Work Backwards!",
+        body: `Some equations need <strong>two operations</strong> to solve. The trick is to work backwards — undo operations in <em>reverse order</em>.<br><br>
+        Think of it like getting dressed: you put on socks <em>then</em> shoes. To undo it, you take off shoes <em>first</em>, then socks. Same idea here!<br><br>
+        <strong>The order to undo:</strong><br>
+        1️⃣ First, undo any <strong>addition or subtraction</strong><br>
+        2️⃣ Then, undo any <strong>multiplication or division</strong>`,
+        visual: `<div class="visual-box">
+          <p style="color:var(--muted);margin-bottom:8px">Solve: <strong>2x + 3 = 11</strong></p>
+          <div class="equation-box" style="font-size:1.1rem">
+            2x + 3 = 11<br>
+            <span style="color:#f472b6">Step 1:</span> Subtract 3 → 2x = 8<br>
+            <span style="color:#a78bfa">Step 2:</span> Divide by 2 → <span style="color:var(--star)">x = 4 ✅</span>
+          </div>
+        </div>`
+      },
+      {
+        title: "🧩 Why This Order?",
+        body: `In the expression <span class="highlight">2x + 3</span>, here's what happened to x:<br><br>
+        1. x was <strong>multiplied by 2</strong> first (giving 2x)<br>
+        2. Then <strong>3 was added</strong> (giving 2x + 3)<br><br>
+        To undo this, we reverse the order — undo the +3 first, <em>then</em> undo the ×2.<br><br>
+        ⚠️ Remember: always apply the same operation to <strong>both sides</strong> of the equation!`,
+        visual: `<div class="visual-box">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="background:rgba(244,114,182,.15);border-radius:10px;padding:10px;display:flex;align-items:center;gap:10px">
+              <span style="font-size:1.4rem">🚶</span>
+              <span>x started as a mystery number</span>
+            </div>
+            <div style="background:rgba(167,139,250,.15);border-radius:10px;padding:10px;display:flex;align-items:center;gap:10px">
+              <span style="font-size:1.4rem">✖️</span>
+              <span>Multiplied by 2 → became 2x</span>
+            </div>
+            <div style="background:rgba(251,146,60,.15);border-radius:10px;padding:10px;display:flex;align-items:center;gap:10px">
+              <span style="font-size:1.4rem">➕</span>
+              <span>Added 3 → became 2x + 3 = 11</span>
+            </div>
+            <div style="color:var(--teal);text-align:center;font-size:.9rem;padding-top:4px">↓ Now reverse: subtract 3 first, then divide by 2</div>
+          </div>
+        </div>`
+      },
+      {
+        title: "✅ Always Check Your Answer",
+        body: `After solving, <strong>substitute your answer back</strong> into the original equation. If both sides equal the same number, you're correct! This is called <em>verification</em> and good mathematicians always do it.<br><br>
+        It takes 5 seconds and saves you from silly mistakes!`,
+        visual: `<div class="visual-box">
+          <p style="color:var(--muted);margin-bottom:8px">We found x = 4 for 2x + 3 = 11. Let's check:</p>
+          <div class="equation-box" style="font-size:1.2rem">
+            2 × <span style="color:#f472b6">4</span> + 3<br>
+            = 8 + 3<br>
+            = <span style="color:var(--green)">11 ✅ Matches the right side!</span>
+          </div>
+          <p style="color:var(--muted);font-size:.85rem;margin-top:8px">If it didn't equal 11, we'd know we made a mistake!</p>
+        </div>`
+      }
+    ],
+    practice: [
+      { q:"Solve: 2x + 1 = 9", ans:4, opts:[4,5,3,10], hint:"Subtract 1, then divide by 2",
+        explanation:`<strong>How to solve 2x + 1 = 9:</strong><br>
+        This has TWO operations — undo them in reverse order!<br>
+        • <strong>Step 1 — Undo the +1</strong> (subtract 1 from both sides): 2x = 8<br>
+        • <strong>Step 2 — Undo the ×2</strong> (divide both sides by 2): x = 4<br>
+        • Result: <strong style="color:var(--star)">x = 4 ✅</strong><br><br>
+        Check: 2 × 4 + 1 = 8 + 1 = 9 ✓` },
+      { q:"Solve: 3n − 2 = 13", ans:5, opts:[5,4,11,37], hint:"Add 2, then divide by 3",
+        explanation:`<strong>How to solve 3n − 2 = 13:</strong><br>
+        • <strong>Step 1 — Undo the −2</strong> (add 2 to both sides): 3n = 15<br>
+        • <strong>Step 2 — Undo the ×3</strong> (divide both sides by 3): n = 5<br>
+        • Result: <strong style="color:var(--star)">n = 5 ✅</strong><br><br>
+        Check: 3 × 5 − 2 = 15 − 2 = 13 ✓` },
+      { q:"Solve: 4y + 8 = 20", ans:3, opts:[3,4,7,28], hint:"Subtract 8, then divide by 4",
+        explanation:`<strong>How to solve 4y + 8 = 20:</strong><br>
+        • <strong>Step 1 — Undo the +8</strong> (subtract 8 from both sides): 4y = 12<br>
+        • <strong>Step 2 — Undo the ×4</strong> (divide both sides by 4): y = 3<br>
+        • Result: <strong style="color:var(--star)">y = 3 ✅</strong><br><br>
+        Check: 4 × 3 + 8 = 12 + 8 = 20 ✓` },
+      { q:"Solve: 5x − 5 = 20", ans:5, opts:[5,3,4,25], hint:"Add 5, then divide by 5",
+        explanation:`<strong>How to solve 5x − 5 = 20:</strong><br>
+        • <strong>Step 1 — Undo the −5</strong> (add 5 to both sides): 5x = 25<br>
+        • <strong>Step 2 — Undo the ×5</strong> (divide both sides by 5): x = 5<br>
+        • Result: <strong style="color:var(--star)">x = 5 ✅</strong><br><br>
+        Check: 5 × 5 − 5 = 25 − 5 = 20 ✓` },
+      { q:"Solve: 2x + 10 = 24", ans:7, opts:[7,6,17,34], hint:"Subtract 10, then divide by 2",
+        explanation:`<strong>How to solve 2x + 10 = 24:</strong><br>
+        • <strong>Step 1 — Undo the +10</strong> (subtract 10 from both sides): 2x = 14<br>
+        • <strong>Step 2 — Undo the ×2</strong> (divide both sides by 2): x = 7<br>
+        • Result: <strong style="color:var(--star)">x = 7 ✅</strong><br><br>
+        Check: 2 × 7 + 10 = 14 + 10 = 24 ✓` },
+    ],
+    quiz: [
+      { q:"Solve: 2x + 3 = 11", ans:4, opts:[3,4,5,7] },
+      { q:"Solve: 4n − 2 = 14", ans:4, opts:[3,4,5,16] },
+      { q:"Solve: 3y + 9 = 24", ans:5, opts:[4,5,6,11] },
+      { q:"Solve: 5x + 5 = 30", ans:5, opts:[5,6,7,25] },
+      { q:"Solve: 2n − 6 = 10", ans:8, opts:[7,8,9,2] },
+    ]
+  }
+};
+
+/* ═══════════════════════════════════════
+   STARS BACKGROUND
+════════════════════════════════════════*/
+(function(){
+  const c = document.getElementById('stars');
+  for(let i=0;i<120;i++){
+    const s=document.createElement('div');
+    s.className='star';
+    const sz=Math.random()*2.5+.5;
+    s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${Math.random()*4+1.5}s;animation-delay:${Math.random()*4}s;opacity:${Math.random()*.6+.2}`;
+    c.appendChild(s);
+  }
+})();
+
+/* ═══════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════════*/
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function goHome(){
+  updateHomeUI();
+  showScreen('home');
+}
+
+function updateHomeUI(){
+  const total=Object.values(state.levelStars).reduce((a,b)=>a+b,0);
+  document.getElementById('total-stars-home').textContent=total;
+  const maxPossible=15;
+  document.getElementById('progress-bar').style.width=(total/maxPossible*100)+'%';
+
+  for(let lvl=1;lvl<=3;lvl++){
+    const st=state.levelStars[lvl]||0;
+    document.getElementById(`lc${lvl}-stars`).textContent='⭐'.repeat(st)+'☆'.repeat(Math.max(0,5-st));
+    const card=document.getElementById(`lc-${lvl}`);
+    if(state.unlockedLevels.includes(lvl)){
+      card.classList.remove('locked');
+    }
+  }
+}
+
+/* ═══════════════════════════════════════
+   START LEVEL
+════════════════════════════════════════*/
+function startLevel(lvl){
+  if(!state.unlockedLevels.includes(lvl)){
+    showFeedback('🔒 Complete the previous level first!','wrong-fb');
+    return;
+  }
+  state.currentLevel=lvl;
+  state.learnPage=0;
+  showLearn();
+}
+
+/* ═══════════════════════════════════════
+   LEARN
+════════════════════════════════════════*/
+function showLearn(){
+  const lvl=curriculum[state.currentLevel];
+  document.getElementById('learn-title').textContent=`${lvl.icon} Level ${state.currentLevel}: ${lvl.title}`;
+  renderLearnPage(state.learnPage||0);
+  showScreen('learn');
+}
+
+function renderLearnPage(idx){
+  const lvl=curriculum[state.currentLevel];
+  const page=lvl.learn[idx];
+  state.learnPage=idx;
+
+  const nav=lvl.learn.map((_,i)=>`<span style="width:10px;height:10px;border-radius:50%;background:${i===idx?'var(--teal)':'rgba(255,255,255,.2)'};display:inline-block;margin:0 4px;cursor:pointer" onclick="renderLearnPage(${i})"></span>`).join('');
+
+  document.getElementById('learn-content').innerHTML=`
+    <div class="card" style="animation-delay:.1s">
+      <h2>${page.title}</h2>
+      <div style="line-height:1.75;color:#d0d0ee;font-size:1.02rem">${page.body}</div>
+      ${page.visual||''}
+    </div>
+    <div style="text-align:center;margin:8px 0">${nav}</div>
+    <div class="btn-row" style="margin-top:0">
+      ${idx>0?`<button class="btn btn-teal" onclick="renderLearnPage(${idx-1})">← Back</button>`:''}
+      ${idx<lvl.learn.length-1
+        ?`<button class="btn btn-primary" onclick="renderLearnPage(${idx+1})">Next ➜</button>`
+        :`<button class="btn btn-success" onclick="showExamples()">Practice! ➜</button>`
+      }
+    </div>
+  `;
+}
+
+/* ═══════════════════════════════════════
+   PRACTICE
+════════════════════════════════════════*/
+function showExamples(){
+  state.practiceProbIdx=0;
+  state.practiceScore=0;
+  state.practiceAttempted=false;
+  showScreen('practice');
+  renderPractice();
+}
+
+function renderPractice(){
+  const lvl=curriculum[state.currentLevel];
+  const problems=lvl.practice;
+  const idx=state.practiceProbIdx;
+
+  if(idx>=problems.length){
+    showFeedback('🎉 Practice complete! Take the quiz!','correct-fb');
+    setTimeout(()=>startQuiz(),1200);
+    return;
+  }
+
+  const prob=problems[idx];
+  // Shuffle options but keep stable during retries using stored order
+  if(!state.practiceShuffled || state.practiceShuffled.idx !== idx){
+    state.practiceShuffled={ idx, opts:[...prob.opts].sort(()=>Math.random()-.5) };
+  }
+  const shuffled=state.practiceShuffled.opts;
+  state.practiceAttempted=false;
+
+  document.getElementById('practice-title').textContent=`Practice ${idx+1} / ${problems.length}`;
+  document.getElementById('practice-content').innerHTML=`
+    <div class="card" id="practice-card">
+      <h2>❓ Question ${idx+1}</h2>
+      <div class="equation-box">${prob.q}</div>
+      <p style="color:var(--muted);font-size:.9rem;margin-bottom:8px">💡 Hint: ${prob.hint}</p>
+      <div class="options-grid" id="opts-grid">
+        ${shuffled.map(o=>`<button class="opt-btn" onclick="checkPractice(this, ${JSON.stringify(o)}, ${JSON.stringify(prob.ans)})">${o}</button>`).join('')}
+      </div>
+      <div id="prac-explain"></div>
+    </div>
+  `;
+}
+
+function checkPractice(el, chosen, correct){
+  if(state.practiceAttempted && chosen!==correct) return; // prevent spam on retry
+
+  const btns=document.querySelectorAll('#opts-grid .opt-btn');
+
+  if(String(chosen)===String(correct)){
+    btns.forEach(b=>b.disabled=true);
+    el.classList.add('correct');
+    showFeedback('✅ Correct! Well done! 🌟','correct-fb');
+    state.practiceScore=(state.practiceScore||0)+1;
+    // Short pause then next problem
+    setTimeout(()=>{
+      state.practiceProbIdx++;
+      state.practiceAttempted=false;
+      renderPractice();
+    },1400);
+  } else {
+    // Wrong answer
+    state.practiceAttempted=true;
+    el.classList.add('wrong');
+    // Highlight the correct button
+    btns.forEach(b=>{ if(String(b.textContent.trim())===String(correct)) b.classList.add('correct'); });
+    // Disable all buttons temporarily, then re-enable only the wrong ones for retry
+    btns.forEach(b=>b.disabled=true);
+
+    const prob=curriculum[state.currentLevel].practice[state.practiceProbIdx];
+    document.getElementById('prac-explain').innerHTML=`
+      <div class="explain-panel">
+        <strong style="color:#fca5a5;font-size:1rem">❌ Not quite! The correct answer is <span style="color:var(--star)">${correct}</span>.</strong>
+        <br><br>${prob.explanation}
+        <div class="retry-banner">
+          🔄 Have another try! Click the correct answer above.
+        </div>
+      </div>
+    `;
+    showFeedback('❌ Wrong — read the explanation below!','wrong-fb');
+
+    // Re-enable only the WRONG buttons (correct one already green, let them retry)
+    setTimeout(()=>{
+      btns.forEach(b=>{
+        if(!b.classList.contains('correct')){ b.disabled=false; b.classList.remove('wrong'); }
+      });
+    }, 800);
+  }
+}
+
+/* ═══════════════════════════════════════
+   QUIZ
+════════════════════════════════════════*/
+function startQuiz(){
+  state.quizIdx=0;
+  state.quizCorrect=0;
+  state.quizWrong=[];
+  showScreen('quiz');
+  renderQuizQuestion();
+}
+
+function renderQuizDots(){
+  const lvl=curriculum[state.currentLevel];
+  const total=lvl.quiz.length;
+  const dots=document.getElementById('quiz-dots');
+  dots.innerHTML=lvl.quiz.map((_,i)=>{
+    let cls='quiz-dot';
+    if(i<state.quizIdx) cls+=state.quizWrong.includes(i)?' wrong':' done';
+    else if(i===state.quizIdx) cls+=' active';
+    return `<div class="${cls}"></div>`;
+  }).join('');
+}
+
+function renderQuizQuestion(){
+  const lvl=curriculum[state.currentLevel];
+  const questions=lvl.quiz;
+  renderQuizDots();
+
+  if(state.quizIdx>=questions.length){
+    finishQuiz(); return;
+  }
+
+  const q=questions[state.quizIdx];
+  const shuffled=[...q.opts].sort(()=>Math.random()-.5);
+
+  document.getElementById('quiz-content').innerHTML=`
+    <div class="card">
+      <h2>Question ${state.quizIdx+1} of ${questions.length}</h2>
+      <div class="equation-box">${q.q}</div>
+      <div class="options-grid">
+        ${shuffled.map(o=>`<button class="opt-btn" onclick="checkQuiz(this, '${o}', '${q.ans}')">${o}</button>`).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function checkQuiz(el, chosen, correct){
+  const btns=document.querySelectorAll('.opt-btn');
+  btns.forEach(b=>b.disabled=true);
+
+  const isCorrect=String(chosen)===String(correct);
+  if(isCorrect){
+    el.classList.add('correct');
+    state.quizCorrect++;
+    showFeedback('⭐ Correct!','correct-fb');
+  } else {
+    el.classList.add('wrong');
+    btns.forEach(b=>{ if(String(b.textContent)===String(correct)) b.classList.add('correct'); });
+    state.quizWrong.push(state.quizIdx);
+    showFeedback('❌ Oops! Keep going!','wrong-fb');
+  }
+
+  setTimeout(()=>{
+    state.quizIdx++;
+    renderQuizQuestion();
+  },1000);
+}
+
+function pauseQuiz(){
+  const lvl=curriculum[state.currentLevel];
+  const total=lvl.quiz.length;
+  document.getElementById('pause-progress-text').textContent=
+    `Question ${state.quizIdx+1} of ${total} • ${state.quizCorrect} correct so far`;
+  document.getElementById('quiz-pause-modal').classList.add('show');
+}
+
+function resumeQuiz(){
+  document.getElementById('quiz-pause-modal').classList.remove('show');
+}
+
+function pauseGoReview(){
+  document.getElementById('quiz-pause-modal').classList.remove('show');
+  showLearn();
+}
+
+function pauseGoHome(){
+  document.getElementById('quiz-pause-modal').classList.remove('show');
+  updateHomeUI();
+  showScreen('home');
+}
+
+function finishQuiz(){
+  const lvl=curriculum[state.currentLevel];
+  const total=lvl.quiz.length;
+  const correct=state.quizCorrect;
+  const pct=correct/total;
+
+  let stars = pct>=1?5:pct>=.8?4:pct>=.6?3:pct>=.4?2:1;
+  state.levelStars[state.currentLevel]=Math.max(state.levelStars[state.currentLevel]||0,stars);
+
+  if(pct>=.6){
+    showFeedback('🎉 Quiz passed! Play Star Blast!','correct-fb');
+    setTimeout(()=>startCrush(),1000);
+  } else {
+    document.getElementById('quiz-content').innerHTML=`
+      <div class="card" style="text-align:center">
+        <h2 style="color:var(--red)">Let's Try Again!</h2>
+        <div class="equation-box" style="font-size:1.5rem">${correct}/${total} correct</div>
+        <p style="margin:12px 0">You need at least 3/5 to pass. Review the lesson and try again!</p>
+        <div class="btn-row">
+          <button class="btn btn-teal" onclick="showLearn()">📖 Review</button>
+          <button class="btn btn-primary" onclick="startQuiz()">🔄 Retry Quiz</button>
+        </div>
+      </div>
+    `;
+  }
+}
+
+/* ═══════════════════════════════════════
+   CANDY CRUSH MINI GAME
+════════════════════════════════════════*/
+const GEMS=['🔴','🟡','🟢','🔵','🟣','🟠'];
+const COLS=6, ROWS=6;
+let crushBoard=[], crushSelected=null, crushMovesLeft=15, crushGameScore=0, crushAnimating=false;
+
+function startCrush(){
+  crushGameScore=0;
+  crushMovesLeft=15;
+  crushSelected=null;
+  state.crushBonus=0;
+  document.getElementById('crush-score').textContent='0';
+  document.getElementById('crush-moves').textContent=crushMovesLeft;
+  document.getElementById('crush-msg').textContent='';
+  document.getElementById('crush-continue').style.display='none';
+
+  initCrushBoard();
+  showScreen('crush');
+}
+
+function initCrushBoard(){
+  crushBoard=[];
+  for(let r=0;r<ROWS;r++){
+    crushBoard.push([]);
+    for(let c=0;c<COLS;c++){
+      crushBoard[r].push(randGem());
+    }
+  }
+  // ensure no initial matches
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      while(hasMatchAt(r,c)){
+        crushBoard[r][c]=randGem();
+      }
+    }
+  }
+  renderCrushBoard();
+}
+
+function randGem(){ return GEMS[Math.floor(Math.random()*GEMS.length)]; }
+
+function hasMatchAt(r,c){
+  const g=crushBoard[r][c];
+  if(!g) return false;
+  if(c>=2 && crushBoard[r][c-1]===g && crushBoard[r][c-2]===g) return true;
+  if(r>=2 && crushBoard[r-1][c]===g && crushBoard[r-2][c]===g) return true;
+  return false;
+}
+
+function renderCrushBoard(){
+  const board=document.getElementById('crush-board');
+  board.style.gridTemplateColumns=`repeat(${COLS},52px)`;
+  board.innerHTML='';
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      const cell=document.createElement('div');
+      cell.className='crush-cell';
+      cell.dataset.r=r; cell.dataset.c=c;
+      cell.textContent=crushBoard[r][c]||'';
+      const colors=['rgba(239,68,68,.25)','rgba(249,231,132,.25)','rgba(34,197,94,.25)','rgba(59,130,246,.25)','rgba(168,85,247,.25)','rgba(249,115,22,.25)'];
+      const gi=GEMS.indexOf(crushBoard[r][c]);
+      cell.style.background=gi>=0?colors[gi]:'transparent';
+      cell.addEventListener('click',()=>onCrushClick(r,c));
+      board.appendChild(cell);
+    }
+  }
+}
+
+function getCrushCell(r,c){
+  return document.querySelector(`#crush-board .crush-cell[data-r="${r}"][data-c="${c}"]`);
+}
+
+function onCrushClick(r,c){
+  if(crushAnimating||crushMovesLeft<=0||!crushBoard[r][c]) return;
+
+  if(crushSelected===null){
+    crushSelected={r,c};
+    getCrushCell(r,c).classList.add('selected');
+  } else {
+    const prev=crushSelected;
+    getCrushCell(prev.r,prev.c).classList.remove('selected');
+    crushSelected=null;
+
+    const dr=Math.abs(r-prev.r), dc=Math.abs(c-prev.c);
+    if((dr===1&&dc===0)||(dr===0&&dc===1)){
+      // swap
+      const tmp=crushBoard[r][c];
+      crushBoard[r][c]=crushBoard[prev.r][prev.c];
+      crushBoard[prev.r][prev.c]=tmp;
+      renderCrushBoard();
+
+      const matches=findMatches();
+      if(matches.length>0){
+        crushMovesLeft--;
+        document.getElementById('crush-moves').textContent=crushMovesLeft;
+        processMatches(matches);
+      } else {
+        // swap back
+        const t=crushBoard[r][c];
+        crushBoard[r][c]=crushBoard[prev.r][prev.c];
+        crushBoard[prev.r][prev.c]=t;
+        renderCrushBoard();
+        showFeedback('No match there! Try again 😅','wrong-fb');
+      }
+    } else {
+      // re-select
+      crushSelected={r,c};
+      getCrushCell(r,c).classList.add('selected');
+    }
+  }
+}
+
+function findMatches(){
+  const matched=new Set();
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS-2;c++){
+      const g=crushBoard[r][c];
+      if(g&&crushBoard[r][c+1]===g&&crushBoard[r][c+2]===g){
+        matched.add(`${r},${c}`);matched.add(`${r},${c+1}`);matched.add(`${r},${c+2}`);
+        if(c+3<COLS&&crushBoard[r][c+3]===g) matched.add(`${r},${c+3}`);
+      }
+    }
+  }
+  for(let c=0;c<COLS;c++){
+    for(let r=0;r<ROWS-2;r++){
+      const g=crushBoard[r][c];
+      if(g&&crushBoard[r+1][c]===g&&crushBoard[r+2][c]===g){
+        matched.add(`${r},${c}`);matched.add(`${r+1},${c}`);matched.add(`${r+2},${c}`);
+        if(r+3<ROWS&&crushBoard[r+3][c]===g) matched.add(`${r+3},${c}`);
+      }
+    }
+  }
+  return [...matched].map(k=>{ const[r,c]=k.split(','); return{r:+r,c:+c}; });
+}
+
+async function processMatches(matches){
+  crushAnimating=true;
+
+  // animate matched cells
+  matches.forEach(({r,c})=>{
+    const cell=getCrushCell(r,c);
+    if(cell) cell.classList.add('matched');
+  });
+
+  const pts=matches.length*10;
+  crushGameScore+=pts;
+  document.getElementById('crush-score').textContent=crushGameScore;
+  document.getElementById('crush-msg').textContent=`+${pts} stars! 🌟`;
+
+  await sleep(400);
+
+  // remove matched
+  matches.forEach(({r,c})=>{ crushBoard[r][c]=null; });
+
+  // gravity
+  for(let c=0;c<COLS;c++){
+    let empty=ROWS-1;
+    for(let r=ROWS-1;r>=0;r--){
+      if(crushBoard[r][c]!==null){
+        crushBoard[empty][c]=crushBoard[r][c];
+        if(empty!==r) crushBoard[r][c]=null;
+        empty--;
+      }
+    }
+    for(let r=empty;r>=0;r--){ crushBoard[r][c]=randGem(); }
+  }
+
+  renderCrushBoard();
+
+  await sleep(300);
+  const newMatches=findMatches();
+  if(newMatches.length>0){
+    await processMatches(newMatches);
+    return;
+  }
+
+  crushAnimating=false;
+  checkCrushEnd();
+}
+
+function checkCrushEnd(){
+  if(crushMovesLeft<=0){
+    state.crushBonus=Math.floor(crushGameScore/50);
+    document.getElementById('crush-msg').textContent=`Game over! Bonus stars: +${state.crushBonus} ⭐`;
+    document.getElementById('crush-continue').style.display='inline-block';
+  }
+}
+
+function afterCrush(){
+  const lvl=state.currentLevel;
+  const bonus=state.crushBonus||0;
+  state.levelStars[lvl]=Math.min(5,(state.levelStars[lvl]||0)+bonus);
+
+  // unlock next level
+  if(lvl<3 && !state.unlockedLevels.includes(lvl+1)){
+    state.unlockedLevels.push(lvl+1);
+  }
+
+  showWin();
+}
+
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+/* ═══════════════════════════════════════
+   WIN SCREEN
+════════════════════════════════════════*/
+function showWin(){
+  const lvl=state.currentLevel;
+  const stars=state.levelStars[lvl]||0;
+  const bonus=state.crushBonus||0;
+
+  // animate stars
+  const row=document.getElementById('win-stars-row');
+  row.innerHTML='⭐⭐⭐⭐⭐'.split('').map((s,i)=>`<span class="star-icon" id="ws${i}">⭐</span>`).join('');
+
+  document.getElementById('win-msg').innerHTML=`
+    You got <strong style="color:var(--star)">${stars} stars</strong> on Level ${lvl}!
+    ${bonus>0?`<br><span style="color:var(--teal)">+${bonus} bonus stars from Star Blast!</span>`:''}
+    ${lvl<3?'<br>Level '+(lvl+1)+' is now unlocked! 🎉':'<br>You\'ve completed all levels! You\'re an Algebra Star! 🌟'}
+  `;
+
+  document.getElementById('btn-next-level').style.display=lvl<3?'inline-block':'none';
+
+  showScreen('win');
+  launchConfetti();
+
+  // light stars one by one
+  for(let i=0;i<5;i++){
+    setTimeout(()=>{
+      if(i<stars) document.getElementById('ws'+i).classList.add('lit');
+    }, 200+(i*250));
+  }
+}
+
+function goNextLevel(){
+  startLevel(state.currentLevel+1);
+}
+
+/* ═══════════════════════════════════════
+   CONFETTI
+════════════════════════════════════════*/
+function launchConfetti(){
+  const colors=['#f9e784','#ec4899','#06b6d4','#22c55e','#f97316','#7c3aed'];
+  for(let i=0;i<60;i++){
+    const el=document.createElement('div');
+    el.className='confetti-piece';
+    const angle=Math.random()*360;
+    const dist=150+Math.random()*300;
+    el.style.cssText=`
+      left:${40+Math.random()*20}%;
+      top:20%;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      border-radius:${Math.random()>.5?'50%':'2px'};
+      width:${6+Math.random()*8}px;
+      height:${6+Math.random()*8}px;
+      --cx:${Math.cos(angle)*dist}px;
+      --cy:${Math.sin(angle)*dist+200}px;
+      --cd:${1.5+Math.random()*2}s;
+      animation-delay:${Math.random()*.5}s;
+    `;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 3500);
+  }
+}
+
+/* ═══════════════════════════════════════
+   FEEDBACK BANNER
+════════════════════════════════════════*/
+let fbTimer=null;
+function showFeedback(msg,cls){
+  const el=document.getElementById('feedback');
+  el.textContent=msg;
+  el.className=cls+' show';
+  clearTimeout(fbTimer);
+  fbTimer=setTimeout(()=>{ el.classList.remove('show'); }, 1800);
+}
+
+/* ═══════════════════════════════════════
+   INIT
+════════════════════════════════════════*/
+updateHomeUI();
+</script>
+</body>
+</html>
