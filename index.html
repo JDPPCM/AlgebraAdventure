@@ -485,6 +485,103 @@ body {
   transition:all .2s;
 }
 .btn-pause:hover { background:rgba(255,255,255,.14); color:#fff; }
+
+/* ── GLOBAL NAV BAR ── */
+#global-nav {
+  position:fixed;
+  top:12px; right:14px;
+  z-index:300;
+  display:flex;
+  gap:8px;
+}
+.nav-btn {
+  font-family:'Fredoka One',cursive;
+  font-size:.85rem;
+  padding:7px 14px;
+  border:1px solid rgba(255,255,255,.2);
+  border-radius:30px;
+  background:rgba(20,20,50,.75);
+  color:var(--muted);
+  cursor:pointer;
+  backdrop-filter:blur(8px);
+  transition:all .2s;
+}
+.nav-btn:hover { background:rgba(255,255,255,.12); color:#fff; }
+#global-nav.hidden { display:none; }
+
+/* ── ANSWER REVEAL PANEL (quiz wrong) ── */
+.quiz-reveal {
+  background:linear-gradient(135deg,rgba(239,68,68,.12),rgba(249,115,22,.1));
+  border:1px solid rgba(239,68,68,.3);
+  border-radius:16px;
+  padding:16px 18px;
+  margin-top:14px;
+  animation:cardIn .35s ease both;
+  font-size:.97rem;
+  line-height:1.7;
+  color:#f0d0d0;
+}
+.quiz-reveal strong { color:#fca5a5; }
+.quiz-next-btn {
+  display:block;
+  width:100%;
+  margin-top:14px;
+  font-family:'Fredoka One',cursive;
+  font-size:1.1rem;
+  padding:13px;
+  border:none;
+  border-radius:14px;
+  background:linear-gradient(135deg,var(--purple),var(--pink));
+  color:#fff;
+  cursor:pointer;
+  transition:all .2s;
+}
+.quiz-next-btn:hover { filter:brightness(1.1); transform:scale(1.02); }
+
+/* ── GAME INTRO MODAL ── */
+#game-intro-modal {
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(10,10,30,.88);
+  z-index:500;
+  align-items:center;
+  justify-content:center;
+}
+#game-intro-modal.show { display:flex; }
+.game-intro-box {
+  background:linear-gradient(135deg,#1a1a3e,#1e0a2e);
+  border:2px solid rgba(249,231,132,.3);
+  border-radius:28px;
+  padding:36px 32px;
+  text-align:center;
+  max-width:420px;
+  width:92%;
+  box-shadow:0 20px 60px rgba(0,0,0,.7);
+  animation:cardIn .4s ease;
+}
+.game-intro-box h2 { font-family:'Fredoka One',cursive; font-size:2rem; color:var(--star); margin-bottom:8px; }
+.game-intro-box .reward-badge {
+  background:linear-gradient(135deg,rgba(249,231,132,.2),rgba(249,115,22,.15));
+  border:1px solid rgba(249,231,132,.4);
+  border-radius:14px;
+  padding:12px 16px;
+  margin:14px 0;
+  font-size:1rem;
+  color:#fde68a;
+  line-height:1.6;
+}
+.how-to-play {
+  background:rgba(6,182,212,.08);
+  border:1px solid rgba(6,182,212,.25);
+  border-radius:14px;
+  padding:14px 16px;
+  margin:14px 0;
+  text-align:left;
+  font-size:.95rem;
+  color:#c0e8f0;
+  line-height:1.75;
+}
 </style>
 </head>
 <body>
@@ -494,6 +591,38 @@ body {
 <div class="planet" style="width:120px;height:120px;background:radial-gradient(circle at 35% 35%,#7c3aed,#1a1a3e);top:5%;right:-40px;--ft:9s;opacity:.6"></div>
 <div class="planet" style="width:70px;height:70px;background:radial-gradient(circle at 35% 35%,#06b6d4,#0e4060);bottom:15%;left:-20px;--ft:11s;opacity:.5"></div>
 <div class="planet" style="width:40px;height:40px;background:radial-gradient(circle at 35% 35%,#ec4899,#6b1343);top:40%;right:5%;--ft:7s;opacity:.45"></div>
+
+<!-- ════════════ GLOBAL NAV ════════════ -->
+<div id="global-nav" class="hidden">
+  <button class="nav-btn" onclick="navHome()">🏠 Home</button>
+</div>
+
+<!-- ════════════ GAME INTRO MODAL ════════════ -->
+<div id="game-intro-modal">
+  <div class="game-intro-box">
+    <div style="font-size:3rem;margin-bottom:6px">🎉</div>
+    <h2>You Earned a Reward!</h2>
+    <div class="reward-badge">
+      🌟 You passed the quiz — so you've unlocked<br>
+      <strong>Star Blast</strong>, a match-3 bonus game!<br>
+      Every match earns you bonus ⭐ stars.
+    </div>
+    <div class="how-to-play">
+      <strong style="color:var(--teal)">🎮 How to Play:</strong><br>
+      1. <strong>Click a gem</strong> to select it (it glows white)<br>
+      2. <strong>Click a neighbour</strong> next to it to swap them<br>
+      3. Line up <strong>3 or more</strong> of the same colour to match!<br>
+      4. You have <strong>15 moves</strong> — make them count!<br>
+      5. More matches = more bonus stars ⭐
+    </div>
+    <button class="btn btn-success" style="width:100%;font-size:1.2rem;padding:15px" onclick="startGameFromIntro()">
+      🍬 Let's Play!
+    </button>
+    <button class="btn" style="width:100%;margin-top:10px;background:rgba(255,255,255,.07);color:var(--muted);font-size:.95rem" onclick="skipGameFromIntro()">
+      Skip Game &amp; Continue
+    </button>
+  </div>
+</div>
 
 <div id="feedback"></div>
 <div id="app">
@@ -968,12 +1097,6 @@ const curriculum = {
 /* ═══════════════════════════════════════
    NAVIGATION
 ════════════════════════════════════════*/
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById('screen-'+id).classList.add('active');
-  window.scrollTo(0,0);
-}
-
 function goHome(){
   updateHomeUI();
   showScreen('home');
@@ -1087,48 +1210,54 @@ function renderPractice(){
 }
 
 function checkPractice(el, chosen, correct){
-  if(state.practiceAttempted && chosen!==correct) return; // prevent spam on retry
-
+  // After a wrong attempt, only the correct button remains clickable
   const btns=document.querySelectorAll('#opts-grid .opt-btn');
 
   if(String(chosen)===String(correct)){
+    // Correct!
     btns.forEach(b=>b.disabled=true);
     el.classList.add('correct');
     showFeedback('✅ Correct! Well done! 🌟','correct-fb');
     state.practiceScore=(state.practiceScore||0)+1;
-    // Short pause then next problem
     setTimeout(()=>{
       state.practiceProbIdx++;
       state.practiceAttempted=false;
+      state.practiceShuffled=null;
       renderPractice();
-    },1400);
+    },1300);
   } else {
-    // Wrong answer
+    // Wrong answer — show explanation, disable wrong buttons, keep correct one active
+    if(state.practiceAttempted) return; // already shown explanation, ignore extra wrong clicks
     state.practiceAttempted=true;
+
     el.classList.add('wrong');
-    // Highlight the correct button
-    btns.forEach(b=>{ if(String(b.textContent.trim())===String(correct)) b.classList.add('correct'); });
-    // Disable all buttons temporarily, then re-enable only the wrong ones for retry
+    showFeedback('❌ Not quite — read below and try again!','wrong-fb');
+
+    // Disable ALL buttons first
     btns.forEach(b=>b.disabled=true);
 
     const prob=curriculum[state.currentLevel].practice[state.practiceProbIdx];
     document.getElementById('prac-explain').innerHTML=`
       <div class="explain-panel">
-        <strong style="color:#fca5a5;font-size:1rem">❌ Not quite! The correct answer is <span style="color:var(--star)">${correct}</span>.</strong>
-        <br><br>${prob.explanation}
-        <div class="retry-banner">
-          🔄 Have another try! Click the correct answer above.
+        <strong style="color:#fca5a5;font-size:1rem">❌ Not quite!</strong><br><br>
+        ${prob.explanation}
+        <div class="retry-banner" style="margin-top:14px">
+          🔄 Now click the <strong style="color:var(--star)">correct answer (${correct})</strong> above to continue!
         </div>
       </div>
     `;
-    showFeedback('❌ Wrong — read the explanation below!','wrong-fb');
 
-    // Re-enable only the WRONG buttons (correct one already green, let them retry)
+    // After a short delay, re-enable ONLY the correct button so kid must click it
     setTimeout(()=>{
       btns.forEach(b=>{
-        if(!b.classList.contains('correct')){ b.disabled=false; b.classList.remove('wrong'); }
+        const val=b.textContent.trim();
+        if(String(val)===String(correct)){
+          b.disabled=false;
+          b.style.animation='varPulse 1s ease-in-out infinite alternate';
+        }
+        // leave wrong buttons disabled
       });
-    }, 800);
+    }, 600);
   }
 }
 
@@ -1171,33 +1300,86 @@ function renderQuizQuestion(){
     <div class="card">
       <h2>Question ${state.quizIdx+1} of ${questions.length}</h2>
       <div class="equation-box">${q.q}</div>
-      <div class="options-grid">
+      <div class="options-grid" id="quiz-opts">
         ${shuffled.map(o=>`<button class="opt-btn" onclick="checkQuiz(this, '${o}', '${q.ans}')">${o}</button>`).join('')}
       </div>
+      <div id="quiz-feedback-area"></div>
     </div>
   `;
 }
 
 function checkQuiz(el, chosen, correct){
-  const btns=document.querySelectorAll('.opt-btn');
+  const btns=document.querySelectorAll('#quiz-opts .opt-btn');
   btns.forEach(b=>b.disabled=true);
 
   const isCorrect=String(chosen)===String(correct);
   if(isCorrect){
     el.classList.add('correct');
     state.quizCorrect++;
-    showFeedback('⭐ Correct!','correct-fb');
+    // Show a quick correct panel then auto-advance
+    document.getElementById('quiz-feedback-area').innerHTML=`
+      <div class="quiz-reveal" style="border-color:rgba(34,197,94,.4);background:linear-gradient(135deg,rgba(34,197,94,.12),rgba(16,185,129,.08));color:#bbf7d0">
+        <strong style="color:#4ade80">✅ Correct! Great job!</strong>
+        <button class="quiz-next-btn" style="background:linear-gradient(135deg,#16a34a,#22c55e)" onclick="advanceQuiz()">Next Question ➜</button>
+      </div>`;
   } else {
     el.classList.add('wrong');
-    btns.forEach(b=>{ if(String(b.textContent)===String(correct)) b.classList.add('correct'); });
+    // Highlight correct answer
+    btns.forEach(b=>{ if(String(b.textContent.trim())===String(correct)) b.classList.add('correct'); });
     state.quizWrong.push(state.quizIdx);
-    showFeedback('❌ Oops! Keep going!','wrong-fb');
+    // Show what the correct answer was + Next button — no auto-advance
+    document.getElementById('quiz-feedback-area').innerHTML=`
+      <div class="quiz-reveal">
+        <strong>❌ Not quite!</strong> The correct answer was <strong style="color:var(--star)">${correct}</strong>.<br>
+        Don't worry — review this after the quiz and try again!
+        <button class="quiz-next-btn" onclick="advanceQuiz()">Next Question ➜</button>
+      </div>`;
   }
+  renderQuizDots();
+}
 
-  setTimeout(()=>{
-    state.quizIdx++;
-    renderQuizQuestion();
-  },1000);
+function advanceQuiz(){
+  state.quizIdx++;
+  renderQuizQuestion();
+}
+
+function showGameIntro(){
+  document.getElementById('game-intro-modal').classList.add('show');
+}
+
+function startGameFromIntro(){
+  document.getElementById('game-intro-modal').classList.remove('show');
+  startCrush();
+}
+
+function skipGameFromIntro(){
+  document.getElementById('game-intro-modal').classList.remove('show');
+  state.crushBonus=0;
+  const lvl=state.currentLevel;
+  if(lvl<3 && !state.unlockedLevels.includes(lvl+1)){
+    state.unlockedLevels.push(lvl+1);
+  }
+  showWin();
+}
+
+/* ── GLOBAL NAV ── */
+function showGlobalNav(){ document.getElementById('global-nav').classList.remove('hidden'); }
+function hideGlobalNav(){ document.getElementById('global-nav').classList.add('hidden'); }
+
+function navHome(){
+  // Save current position so they can resume later
+  updateHomeUI();
+  showScreen('home');
+  hideGlobalNav();
+}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  window.scrollTo(0,0);
+  // Show global nav on all screens except home
+  if(id==='home') hideGlobalNav();
+  else showGlobalNav();
 }
 
 function pauseQuiz(){
@@ -1227,27 +1409,65 @@ function finishQuiz(){
   const lvl=curriculum[state.currentLevel];
   const total=lvl.quiz.length;
   const correct=state.quizCorrect;
+  const wrong=total-correct;
   const pct=correct/total;
 
   let stars = pct>=1?5:pct>=.8?4:pct>=.6?3:pct>=.4?2:1;
   state.levelStars[state.currentLevel]=Math.max(state.levelStars[state.currentLevel]||0,stars);
+  updateHomeUI();
 
-  if(pct>=.6){
-    showFeedback('🎉 Quiz passed! Play Star Blast!','correct-fb');
-    setTimeout(()=>startCrush(),1000);
-  } else {
-    document.getElementById('quiz-content').innerHTML=`
-      <div class="card" style="text-align:center">
-        <h2 style="color:var(--red)">Let's Try Again!</h2>
-        <div class="equation-box" style="font-size:1.5rem">${correct}/${total} correct</div>
-        <p style="margin:12px 0">You need at least 3/5 to pass. Review the lesson and try again!</p>
-        <div class="btn-row">
-          <button class="btn btn-teal" onclick="showLearn()">📖 Review</button>
-          <button class="btn btn-primary" onclick="startQuiz()">🔄 Retry Quiz</button>
+  const passed=pct>=.6;
+  const grade=pct>=1?'Perfect! 🌟':pct>=.8?'Excellent! 🎉':pct>=.6?'Well done! ✅':pct>=.4?'Almost there! 💪':'Keep practising! 📖';
+
+  // Build a per-question summary
+  const questions=lvl.quiz;
+  const summaryRows=questions.map((q,i)=>{
+    const wasWrong=state.quizWrong.includes(i);
+    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.07)">
+      <span style="font-size:1.2rem">${wasWrong?'❌':'✅'}</span>
+      <span style="font-size:.9rem;color:${wasWrong?'#fca5a5':'#86efac'}">${q.q}</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('quiz-dots').innerHTML='';
+  document.getElementById('quiz-content').innerHTML=`
+    <div class="card" style="text-align:center;max-width:600px">
+      <h2 style="color:${passed?'var(--green)':'var(--orange)'}">Quiz Complete! ${grade}</h2>
+
+      <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin:16px 0">
+        <div style="background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.35);border-radius:14px;padding:14px 22px">
+          <div style="font-family:'Fredoka One',cursive;font-size:2rem;color:#4ade80">${correct}</div>
+          <div style="font-size:.85rem;color:var(--muted)">Correct ✅</div>
+        </div>
+        <div style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:14px;padding:14px 22px">
+          <div style="font-family:'Fredoka One',cursive;font-size:2rem;color:#f87171">${wrong}</div>
+          <div style="font-size:.85rem;color:var(--muted)">Wrong ❌</div>
+        </div>
+        <div style="background:rgba(249,231,132,.12);border:1px solid rgba(249,231,132,.3);border-radius:14px;padding:14px 22px">
+          <div style="font-family:'Fredoka One',cursive;font-size:2rem;color:var(--star)">${Math.round(pct*100)}%</div>
+          <div style="font-size:.85rem;color:var(--muted)">Score</div>
         </div>
       </div>
-    `;
-  }
+
+      <div style="text-align:left;margin:14px 0;padding:0 4px">
+        <div style="font-family:'Fredoka One',cursive;color:var(--teal);margin-bottom:8px">Question Summary:</div>
+        ${summaryRows}
+      </div>
+
+      ${passed
+        ? `<p style="color:#86efac;margin:12px 0">🎉 You passed! You've unlocked <strong>Star Blast</strong> as a reward!</p>
+           <div class="btn-row">
+             <button class="btn btn-primary" onclick="startQuiz()">🔄 Retake Quiz</button>
+             <button class="btn btn-success" onclick="showGameIntro()">🍬 Claim Reward ➜</button>
+           </div>`
+        : `<p style="color:#fca5a5;margin:12px 0">You need <strong>3/5</strong> to pass. Review the lesson and give it another go!</p>
+           <div class="btn-row">
+             <button class="btn btn-teal" onclick="showLearn()">📖 Review Lesson</button>
+             <button class="btn btn-primary" onclick="startQuiz()">🔄 Retake Quiz</button>
+           </div>`
+      }
+    </div>
+  `;
 }
 
 /* ═══════════════════════════════════════
