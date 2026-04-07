@@ -582,6 +582,63 @@ body {
   color:#c0e8f0;
   line-height:1.75;
 }
+
+/* ── GAME OVER MODAL ── */
+#game-over-modal {
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(10,10,30,.88);
+  z-index:600;
+  align-items:center;
+  justify-content:center;
+}
+#game-over-modal.show { display:flex; }
+.game-over-box {
+  background:linear-gradient(135deg,#1a1a3e,#0e2040);
+  border:2px solid rgba(249,231,132,.35);
+  border-radius:28px;
+  padding:36px 30px;
+  text-align:center;
+  max-width:380px;
+  width:92%;
+  box-shadow:0 20px 60px rgba(0,0,0,.7);
+  animation:cardIn .45s cubic-bezier(.34,1.56,.64,1);
+}
+.game-over-box .go-icon { font-size:3.5rem; margin-bottom:8px; }
+.game-over-box h2 { font-family:'Fredoka One',cursive; font-size:2rem; color:var(--star); margin-bottom:6px; }
+.game-over-box .go-score {
+  font-family:'Fredoka One',cursive;
+  font-size:1.1rem;
+  background:rgba(249,231,132,.12);
+  border:1px solid rgba(249,231,132,.3);
+  border-radius:14px;
+  padding:12px 18px;
+  margin:14px 0;
+  color:#fde68a;
+  line-height:1.7;
+}
+.game-over-box .go-bonus {
+  font-family:'Fredoka One',cursive;
+  font-size:1.5rem;
+  color:var(--teal);
+  margin:10px 0 18px;
+}
+
+/* ── HINT BUTTON ── */
+.btn-hint {
+  font-family:'Fredoka One',cursive;
+  font-size:.88rem;
+  padding:6px 16px;
+  border:1px solid rgba(249,231,132,.35);
+  border-radius:30px;
+  background:rgba(249,231,132,.1);
+  color:#fde68a;
+  cursor:pointer;
+  transition:all .2s;
+}
+.btn-hint:hover { background:rgba(249,231,132,.2); }
+.btn-hint:disabled { opacity:.5; cursor:default; }
 </style>
 </head>
 <body>
@@ -654,6 +711,42 @@ body {
       <p>Two-step Equations</p>
       <div id="lc3-stars" style="font-size:.9rem;margin-top:6px;color:#f9e784"></div>
     </div>
+    <div class="level-card lc-1 locked" id="lc-4" onclick="startLevel(4)">
+      <div class="lc-icon">📊</div>
+      <h3>Level 4</h3>
+      <p>Inequalities</p>
+      <div id="lc4-stars" style="font-size:.9rem;margin-top:6px;color:#f9e784"></div>
+    </div>
+    <div class="level-card lc-2 locked" id="lc-5" onclick="startLevel(5)">
+      <div class="lc-icon">🔗</div>
+      <h3>Level 5</h3>
+      <p>Like Terms & Simplifying</p>
+      <div id="lc5-stars" style="font-size:.9rem;margin-top:6px;color:#f9e784"></div>
+    </div>
+    <div class="level-card lc-3 locked" id="lc-6" onclick="startLevel(6)">
+      <div class="lc-icon">📝</div>
+      <h3>Level 6</h3>
+      <p>Word Problems</p>
+      <div id="lc6-stars" style="font-size:.9rem;margin-top:6px;color:#f9e784"></div>
+    </div>
+    <div class="level-card lc-1 locked" id="lc-7" onclick="startLevel(7)">
+      <div class="lc-icon">🔀</div>
+      <h3>Level 7</h3>
+      <p>Simultaneous Equations</p>
+      <div id="lc7-stars" style="font-size:.9rem;margin-top:6px;color:#f9e784"></div>
+    </div>
+    <div class="level-card lc-2 locked" id="lc-8" onclick="startLevel(8)">
+      <div class="lc-icon">📈</div>
+      <h3>Level 8</h3>
+      <p>Graphing Linear Equations</p>
+      <div id="lc8-stars" style="font-size:.9rem;margin-top:6px;color:#f9e784"></div>
+    </div>
+    <div class="level-card lc-3 locked" id="lc-9" onclick="startLevel(9)">
+      <div class="lc-icon">🔷</div>
+      <h3>Level 9</h3>
+      <p>Quadratics</p>
+      <div id="lc9-stars" style="font-size:.9rem;margin-top:6px;color:#f9e784"></div>
+    </div>
   </div>
 
   <div class="hero-icon">🚀</div>
@@ -698,10 +791,30 @@ body {
   <div id="quiz-content"></div>
 </div>
 
+<!-- ════════════ GAME OVER MODAL ════════════ -->
+<div id="game-over-modal">
+  <div class="game-over-box">
+    <div class="go-icon">🎮</div>
+    <h2>Game Over!</h2>
+    <p style="color:var(--muted);margin-bottom:4px">You've used all 15 moves.</p>
+    <div class="go-score">
+      Gems matched: <strong id="go-total-score">0</strong> points<br>
+      Bonus stars earned: <strong id="go-bonus-stars" style="color:var(--star)">0 ⭐</strong>
+    </div>
+    <div class="go-bonus" id="go-bonus-msg"></div>
+    <button class="btn btn-success" style="width:100%;font-size:1.15rem;padding:14px;margin-bottom:10px" onclick="closeGameOver()">
+      🏆 Collect Stars &amp; Continue ➜
+    </button>
+    <button class="btn" style="width:100%;background:rgba(255,255,255,.07);color:var(--muted);font-size:.95rem" onclick="replayCrush()">
+      🔄 Play Again
+    </button>
+  </div>
+</div>
+
 <!-- ════════════ CRUSH SCREEN ════════════ -->
 <div id="screen-crush" class="screen">
   <div class="logo" style="font-size:2rem">🍬 Star Blast!</div>
-  <div class="tagline" id="crush-tagline">Match 3 to earn bonus stars!</div>
+  <div class="tagline">Match 3 gems to earn bonus stars!</div>
   <div class="card" style="max-width:420px;padding:20px">
     <div class="crush-header">
       <div class="crush-score-box">⭐ <span id="crush-score">0</span></div>
@@ -710,8 +823,7 @@ body {
     <div id="crush-board"></div>
     <div id="crush-msg" style="text-align:center;font-family:'Fredoka One',cursive;font-size:1.1rem;min-height:28px;color:var(--star)"></div>
     <div class="btn-row" style="margin-top:12px">
-      <button class="btn btn-success" id="crush-continue" style="display:none" onclick="afterCrush()">Continue ➜</button>
-      <button class="btn btn-teal" onclick="afterCrush()">Skip Game</button>
+      <button class="btn btn-teal" onclick="skipGameFromIntro()">Skip Game</button>
     </div>
   </div>
 </div>
@@ -738,8 +850,8 @@ body {
 ════════════════════════════════════════*/
 const state = {
   currentLevel: 1,
-  unlockedLevels: [1],
-  levelStars: {1:0,2:0,3:0},
+  unlockedLevels: [1,2,3,4,5,6,7,8,9],
+  levelStars: {1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0},
   practiceProbIdx: 0,
   quizIdx: 0,
   quizCorrect: 0,
@@ -752,330 +864,617 @@ const state = {
 ════════════════════════════════════════*/
 const curriculum = {
   1: {
-    title: "Variables & Expressions",
-    icon: "🔢",
-    learn: [
+    title:"Variables & Expressions", icon:"🔢",
+    learn:[
       {
-        title: "🔮 What is a Variable?",
-        body: `A <strong>variable</strong> is a letter that stands for an <em>unknown</em> number — like a mystery box that could hold any value! We use letters like <span class="highlight">x</span>, <span class="highlight">y</span>, <span class="highlight">n</span>, or <span class="highlight">a</span>.<br><br>
+        title:"🔮 What is a Variable?",
+        body:`A <strong>variable</strong> is a letter that stands for an <em>unknown</em> number — like a mystery box that could hold any value! We use letters like <span class="highlight">x</span>, <span class="highlight">y</span>, <span class="highlight">n</span>, or <span class="highlight">a</span>.<br><br>
         🌟 <strong>Real-life example:</strong> Imagine you have some sweets in a bag and you don't know how many. We could call that number <span class="highlight">x</span>. Once you count them, you know what x is!`,
-        visual: `<div class="visual-box">
-          <div class="var-demo">
-            <div class="box-var box-x">x</div>
-            <div class="op">=</div>
-            <div class="box-var box-num">?</div>
-          </div>
-          <p style="color:var(--muted);font-size:.9rem;margin-top:8px">x could be 3, 7, 15 — it's a mystery until we solve it!</p>
-          <div style="margin-top:12px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-            <span style="background:rgba(124,58,237,.3);padding:6px 14px;border-radius:10px;font-size:.95rem">🍬 sweets in bag = x</span>
-            <span style="background:rgba(6,182,212,.25);padding:6px 14px;border-radius:10px;font-size:.95rem">🚗 cars in car park = n</span>
-          </div>
-        </div>`
+        visual:`<div class="visual-box"><div class="var-demo"><div class="box-var box-x">x</div><div class="op">=</div><div class="box-var box-num">?</div></div><p style="color:var(--muted);font-size:.9rem;margin-top:8px">x could be 3, 7, 15 — it's a mystery until we solve it!</p><div style="margin-top:12px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><span style="background:rgba(124,58,237,.3);padding:6px 14px;border-radius:10px;font-size:.95rem">🍬 sweets in bag = x</span><span style="background:rgba(6,182,212,.25);padding:6px 14px;border-radius:10px;font-size:.95rem">🚗 cars in car park = n</span></div></div>`
       },
       {
-        title: "🔢 Variables, Coefficients & Constants",
-        body: `Every algebraic expression has three kinds of parts. Let's look at <span class="highlight">3x + 5</span> carefully:<br><br>
-        <strong style="color:#a78bfa">📌 Variable</strong> — the letter. Here it's <span class="highlight">x</span>. It represents the unknown number.<br><br>
-        <strong style="color:#34d399">📌 Coefficient</strong> — the number <em>in front of</em> the variable that multiplies it. Here it's <span class="highlight">3</span>. So 3x means "3 times x".<br><br>
-        <strong style="color:#fb923c">📌 Constant</strong> — a plain number on its own that never changes. Here it's <span class="highlight">5</span>. It stays 5 no matter what x is.`,
-        visual: `<div class="visual-box">
-          <div class="equation-box" style="font-size:2rem;letter-spacing:4px">
-            <span style="color:#a78bfa">3</span><span style="color:#f472b6">x</span><span style="color:#fff"> + </span><span style="color:#fb923c">5</span>
-          </div>
-          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px">
-            <div style="background:rgba(167,139,250,.2);border:1px solid rgba(167,139,250,.5);border-radius:12px;padding:10px 16px;text-align:center">
-              <div style="font-size:1.4rem;font-weight:800;color:#a78bfa">3</div>
-              <div style="font-size:.8rem;color:var(--muted)">Coefficient</div>
-              <div style="font-size:.75rem;color:var(--muted)">(multiplies x)</div>
-            </div>
-            <div style="background:rgba(244,114,182,.2);border:1px solid rgba(244,114,182,.5);border-radius:12px;padding:10px 16px;text-align:center">
-              <div style="font-size:1.4rem;font-weight:800;color:#f472b6">x</div>
-              <div style="font-size:.8rem;color:var(--muted)">Variable</div>
-              <div style="font-size:.75rem;color:var(--muted)">(the unknown)</div>
-            </div>
-            <div style="background:rgba(251,146,60,.2);border:1px solid rgba(251,146,60,.5);border-radius:12px;padding:10px 16px;text-align:center">
-              <div style="font-size:1.4rem;font-weight:800;color:#fb923c">5</div>
-              <div style="font-size:.8rem;color:var(--muted)">Constant</div>
-              <div style="font-size:.75rem;color:var(--muted)">(never changes)</div>
-            </div>
-          </div>
-        </div>`
+        title:"🔢 Variables, Coefficients & Constants",
+        body:`Every algebraic expression has three kinds of parts. Let's look at <span class="highlight">3x + 5</span>:<br><br>
+        <strong style="color:#a78bfa">📌 Variable</strong> — the letter <span class="highlight">x</span>. It's the unknown number.<br><br>
+        <strong style="color:#34d399">📌 Coefficient</strong> — the number <em>in front of</em> the variable: <span class="highlight">3</span>. So 3x means "3 times x".<br><br>
+        <strong style="color:#fb923c">📌 Constant</strong> — a plain number on its own: <span class="highlight">5</span>. It never changes no matter what x is.`,
+        visual:`<div class="visual-box"><div class="equation-box" style="font-size:2rem;letter-spacing:4px"><span style="color:#a78bfa">3</span><span style="color:#f472b6">x</span><span style="color:#fff"> + </span><span style="color:#fb923c">5</span></div><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px"><div style="background:rgba(167,139,250,.2);border:1px solid rgba(167,139,250,.5);border-radius:12px;padding:10px 16px;text-align:center"><div style="font-size:1.4rem;font-weight:800;color:#a78bfa">3</div><div style="font-size:.8rem;color:var(--muted)">Coefficient</div><div style="font-size:.75rem;color:var(--muted)">(multiplies x)</div></div><div style="background:rgba(244,114,182,.2);border:1px solid rgba(244,114,182,.5);border-radius:12px;padding:10px 16px;text-align:center"><div style="font-size:1.4rem;font-weight:800;color:#f472b6">x</div><div style="font-size:.8rem;color:var(--muted)">Variable</div><div style="font-size:.75rem;color:var(--muted)">(the unknown)</div></div><div style="background:rgba(251,146,60,.2);border:1px solid rgba(251,146,60,.5);border-radius:12px;padding:10px 16px;text-align:center"><div style="font-size:1.4rem;font-weight:800;color:#fb923c">5</div><div style="font-size:.8rem;color:var(--muted)">Constant</div><div style="font-size:.75rem;color:var(--muted)">(never changes)</div></div></div></div>`
       },
       {
-        title: "🧪 What is an Expression?",
-        body: `An <strong>algebraic expression</strong> combines variables, coefficients, and constants using +, −, ×, ÷.<br><br>
-        ⚠️ <strong>Key rule:</strong> An expression does <em>NOT</em> have an = sign. If it has an = sign, it's an <em>equation</em> (that comes next!)<br><br>
+        title:"🧪 What is an Expression?",
+        body:`An <strong>algebraic expression</strong> combines variables, coefficients, and constants using +, −, ×, ÷.<br><br>
+        ⚠️ <strong>Key rule:</strong> An expression does <em>NOT</em> have an = sign.<br><br>
         ✅ <strong>Expressions:</strong> <span class="highlight">3x + 5</span>, <span class="highlight">2y − 1</span>, <span class="highlight">n + 7</span><br>
         ❌ <strong>NOT expressions:</strong> <span class="highlight">x = 4</span>, <span class="highlight">3n + 1 = 10</span>`,
-        visual: `<div class="visual-box">
-          <p style="color:var(--muted);margin-bottom:10px">Can you spot the coefficient, variable, and constant?</p>
-          <div class="equation-box" style="font-size:1.8rem"><span style="color:#a78bfa">4</span><span style="color:#f472b6">y</span> − <span style="color:#fb923c">2</span></div>
-          <div style="margin-top:10px;font-size:.95rem;color:var(--muted)">Coefficient = <strong style="color:#a78bfa">4</strong> &nbsp;|&nbsp; Variable = <strong style="color:#f472b6">y</strong> &nbsp;|&nbsp; Constant = <strong style="color:#fb923c">2</strong></div>
-        </div>`
+        visual:`<div class="visual-box"><p style="color:var(--muted);margin-bottom:10px">Can you spot the coefficient, variable, and constant?</p><div class="equation-box" style="font-size:1.8rem"><span style="color:#a78bfa">4</span><span style="color:#f472b6">y</span> − <span style="color:#fb923c">2</span></div><div style="margin-top:10px;font-size:.95rem;color:var(--muted)">Coefficient = <strong style="color:#a78bfa">4</strong> &nbsp;|&nbsp; Variable = <strong style="color:#f472b6">y</strong> &nbsp;|&nbsp; Constant = <strong style="color:#fb923c">2</strong></div></div>`
       },
       {
-        title: "🎯 Evaluating Expressions",
-        body: `To <strong>evaluate</strong> an expression means to find its value when you know what the variable equals. Simply <em>replace</em> the variable with the number and then calculate step by step!`,
-        visual: `<div class="visual-box">
-          <p style="color:var(--muted);margin-bottom:8px">💡 If x = <strong style="color:#f472b6">4</strong>, what is 3x + 5?</p>
-          <div class="equation-box" style="font-size:1.3rem">Step 1: Replace x with 4 → 3 × <span style="color:#f472b6">4</span> + 5</div>
-          <div class="equation-box" style="font-size:1.3rem">Step 2: Multiply → <span style="color:#a78bfa">12</span> + 5</div>
-          <div class="equation-box" style="font-size:1.5rem;color:var(--star)">Step 3: Add → <strong>17</strong> ✅</div>
-        </div>`
+        title:"🎯 Evaluating Expressions",
+        body:`To <strong>evaluate</strong> an expression means to find its value when you know what the variable equals. Simply <em>replace</em> the variable with the number and calculate step by step!`,
+        visual:`<div class="visual-box"><p style="color:var(--muted);margin-bottom:8px">💡 If x = <strong style="color:#f472b6">4</strong>, what is 3x + 5?</p><div class="equation-box" style="font-size:1.2rem">Step 1: Replace x with 4 → 3 × <span style="color:#f472b6">4</span> + 5</div><div class="equation-box" style="font-size:1.2rem">Step 2: Multiply → <span style="color:#a78bfa">12</span> + 5</div><div class="equation-box" style="font-size:1.4rem;color:var(--star)">Step 3: Add → <strong>17</strong> ✅</div></div>`
       }
     ],
-    practice: [
-      { q:"If x = 3, what is 2x + 1?", ans:7, opts:[5,7,9,8], hint:"Replace x with 3: 2×3+1",
-        explanation:`<strong>Here's how to solve it step by step:</strong><br>
-        The expression is <strong>2x + 1</strong> and x = 3.<br>
-        • <strong>Step 1 — Replace x with 3:</strong> 2 × 3 + 1<br>
-        • <strong>Step 2 — Multiply first (coefficient × variable):</strong> 6 + 1<br>
-        • <strong>Step 3 — Add the constant:</strong> 6 + 1 = <strong style="color:var(--star)">7</strong><br><br>
-        Remember: 2x means the <em>coefficient</em> (2) times the <em>variable</em> (x). Always multiply before adding!` },
-      { q:"If n = 5, what is n + 4?", ans:9, opts:[9,10,6,1], hint:"Replace n with 5: 5+4",
-        explanation:`<strong>Here's how to solve it step by step:</strong><br>
-        The expression is <strong>n + 4</strong> and n = 5.<br>
-        • <strong>Step 1 — Replace n with 5:</strong> 5 + 4<br>
-        • <strong>Step 2 — Add:</strong> 5 + 4 = <strong style="color:var(--star)">9</strong><br><br>
-        Here the coefficient of n is 1 (invisible), so n just means 1 × n = n itself. Simple substitution!` },
-      { q:"If y = 2, what is 4y − 3?", ans:5, opts:[5,6,11,4], hint:"Replace y with 2: 4×2−3",
-        explanation:`<strong>Here's how to solve it step by step:</strong><br>
-        The expression is <strong>4y − 3</strong> and y = 2.<br>
-        • <strong>Step 1 — Replace y with 2:</strong> 4 × 2 − 3<br>
-        • <strong>Step 2 — Multiply (coefficient × variable):</strong> 8 − 3<br>
-        • <strong>Step 3 — Subtract the constant:</strong> 8 − 3 = <strong style="color:var(--star)">5</strong><br><br>
-        The <em>constant</em> (−3) never changes — it stays −3 whatever y is. Only the 4y part changes!` },
-      { q:"If x = 6, what is x ÷ 2 + 1?", ans:4, opts:[4,7,3,13], hint:"Replace x with 6: 6÷2+1",
-        explanation:`<strong>Here's how to solve it step by step:</strong><br>
-        The expression is <strong>x ÷ 2 + 1</strong> and x = 6.<br>
-        • <strong>Step 1 — Replace x with 6:</strong> 6 ÷ 2 + 1<br>
-        • <strong>Step 2 — Divide first (order of operations):</strong> 3 + 1<br>
-        • <strong>Step 3 — Add:</strong> 3 + 1 = <strong style="color:var(--star)">4</strong><br><br>
-        Important: always do multiplication and division BEFORE addition and subtraction!` },
-      { q:"If a = 10, what is 3a − 5?", ans:25, opts:[25,30,15,35], hint:"Replace a with 10: 3×10−5",
-        explanation:`<strong>Here's how to solve it step by step:</strong><br>
-        The expression is <strong>3a − 5</strong> and a = 10.<br>
-        • <strong>Step 1 — Replace a with 10:</strong> 3 × 10 − 5<br>
-        • <strong>Step 2 — Multiply (coefficient × variable):</strong> 30 − 5<br>
-        • <strong>Step 3 — Subtract the constant:</strong> 30 − 5 = <strong style="color:var(--star)">25</strong><br><br>
-        The coefficient (3) multiplies a, giving 3 × 10 = 30. Then we subtract the constant (5).` },
+    practice:[
+      { q:"If x = 3, what is 2x + 1?", ans:7, opts:[5,7,9,8], hint:"Step 1: Replace x with 3 → 2×3+1\nStep 2: Multiply → 6+1\nStep 3: Add → 7",
+        explanation:`<strong>How to solve 2x + 1 when x = 3:</strong><br>• Replace x with 3: 2 × 3 + 1<br>• Multiply first: 6 + 1<br>• Add the constant: <strong style="color:var(--star)">7 ✅</strong>` },
+      { q:"If n = 5, what is n + 4?", ans:9, opts:[9,10,6,1], hint:"Step 1: Replace n with 5 → 5+4\nStep 2: Add → 9",
+        explanation:`<strong>How to solve n + 4 when n = 5:</strong><br>• Replace n with 5: 5 + 4<br>• Add: <strong style="color:var(--star)">9 ✅</strong>` },
+      { q:"If y = 2, what is 4y − 3?", ans:5, opts:[5,6,11,4], hint:"Step 1: Replace y with 2 → 4×2−3\nStep 2: Multiply → 8−3\nStep 3: Subtract → 5",
+        explanation:`<strong>How to solve 4y − 3 when y = 2:</strong><br>• Replace y with 2: 4 × 2 − 3<br>• Multiply: 8 − 3<br>• Subtract: <strong style="color:var(--star)">5 ✅</strong>` },
+      { q:"If x = 6, what is x ÷ 2 + 1?", ans:4, opts:[4,7,3,13], hint:"Step 1: Replace x with 6 → 6÷2+1\nStep 2: Divide first → 3+1\nStep 3: Add → 4",
+        explanation:`<strong>How to solve x ÷ 2 + 1 when x = 6:</strong><br>• Replace x: 6 ÷ 2 + 1<br>• Divide first: 3 + 1<br>• Add: <strong style="color:var(--star)">4 ✅</strong>` },
+      { q:"If a = 10, what is 3a − 5?", ans:25, opts:[25,30,15,35], hint:"Step 1: Replace a with 10 → 3×10−5\nStep 2: Multiply → 30−5\nStep 3: Subtract → 25",
+        explanation:`<strong>How to solve 3a − 5 when a = 10:</strong><br>• Replace a: 3 × 10 − 5<br>• Multiply: 30 − 5<br>• Subtract: <strong style="color:var(--star)">25 ✅</strong>` }
     ],
-    quiz: [
+    quiz:[
       { q:"Which of these is an expression (no = sign)?", ans:"5x + 3", opts:["5x + 3","x = 7","2 = 2","y + 1 = 4"] },
       { q:"If x = 4, what is 2x + 3?", ans:11, opts:[9,10,11,12] },
       { q:"If n = 0, what is 5n + 8?", ans:8, opts:[0,5,8,13] },
-      { q:"Which letter is a variable in: 7y − 2?", ans:"y", opts:["7","y","2","−"] },
-      { q:"If x = 3, what is x² (x times x)?", ans:9, opts:[6,9,8,12] },
+      { q:"Which letter is the variable in: 7y − 2?", ans:"y", opts:["7","y","2","−"] },
+      { q:"If x = 3, what is x × x?", ans:9, opts:[6,9,8,12] }
     ]
   },
+
   2: {
-    title: "Solving Equations",
-    icon: "⚖️",
-    learn: [
+    title:"Solving Equations", icon:"⚖️",
+    learn:[
       {
-        title: "⚖️ What is an Equation?",
-        body: `An <strong>equation</strong> is like a perfectly balanced scale — both sides must always be <em>equal</em>. It has an <span class="highlight">=</span> sign in the middle.<br><br>
-        🌟 <strong>The big difference from expressions:</strong><br>
-        • <strong>Expression:</strong> <span class="highlight">3x + 5</span> — no = sign, just a combination<br>
+        title:"⚖️ What is an Equation?",
+        body:`An <strong>equation</strong> is like a balanced scale — both sides must always be <em>equal</em>. It has an <span class="highlight">=</span> sign in the middle.<br><br>
+        • <strong>Expression:</strong> <span class="highlight">3x + 5</span> — no = sign<br>
         • <strong>Equation:</strong> <span class="highlight">3x + 5 = 11</span> — has = sign, two sides that must balance<br><br>
-        Our job is to figure out what value of x makes both sides equal!`,
-        visual: `<div class="visual-box">
-          <div style="display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap">
-            <div style="background:rgba(124,58,237,.25);border:1px solid rgba(124,58,237,.4);border-radius:14px;padding:14px 20px;text-align:center">
-              <div style="font-family:'Fredoka One',cursive;font-size:1.4rem">x + 3</div>
-              <div style="font-size:.8rem;color:var(--muted);margin-top:4px">Left side</div>
-            </div>
-            <div style="font-size:2rem;color:var(--star)">⚖️</div>
-            <div style="background:rgba(6,182,212,.2);border:1px solid rgba(6,182,212,.4);border-radius:14px;padding:14px 20px;text-align:center">
-              <div style="font-family:'Fredoka One',cursive;font-size:1.4rem">7</div>
-              <div style="font-size:.8rem;color:var(--muted);margin-top:4px">Right side</div>
-            </div>
-          </div>
-          <p style="color:var(--muted);font-size:.9rem;margin-top:12px">What is x? If x = 4, then 4+3 = 7 ✅ The scale balances!</p>
-        </div>`
+        Our job is to find what value of x makes both sides equal!`,
+        visual:`<div class="visual-box"><div style="display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap"><div style="background:rgba(124,58,237,.25);border:1px solid rgba(124,58,237,.4);border-radius:14px;padding:14px 20px;text-align:center"><div style="font-family:'Fredoka One',cursive;font-size:1.4rem">x + 3</div><div style="font-size:.8rem;color:var(--muted);margin-top:4px">Left side</div></div><div style="font-size:2rem;color:var(--star)">⚖️</div><div style="background:rgba(6,182,212,.2);border:1px solid rgba(6,182,212,.4);border-radius:14px;padding:14px 20px;text-align:center"><div style="font-family:'Fredoka One',cursive;font-size:1.4rem">7</div><div style="font-size:.8rem;color:var(--muted);margin-top:4px">Right side</div></div></div><p style="color:var(--muted);font-size:.9rem;margin-top:12px">If x = 4, then 4+3 = 7 ✅ The scale balances!</p></div>`
       },
       {
-        title: "🔑 The Golden Rule of Equations",
-        body: `<strong>Whatever you do to one side, you MUST do to the other side!</strong><br><br>
-        This is the most important rule in algebra. If you add, subtract, multiply, or divide on one side, you have to do exactly the same thing on the other side — otherwise the scale tips and the equation breaks!<br><br>
-        Our goal is always to get the <strong>variable alone</strong> on one side (called "isolating" the variable).`,
-        visual: `<div class="visual-box">
-          <p style="color:var(--muted);margin-bottom:10px">Solving x + 3 = 7 — subtract 3 from BOTH sides:</p>
-          <div class="equation-box" style="font-size:1.2rem">
-            x + 3 <span style="color:var(--star)">&nbsp;=&nbsp;</span> 7<br>
-            <span style="color:#f472b6">− 3</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#f472b6">− 3</span><br>
-            <span style="border-top:2px solid rgba(255,255,255,.3);padding-top:8px;display:inline-block">x <span style="color:var(--star)">&nbsp;=&nbsp;</span> <span style="color:var(--green)">4 ✅</span></span>
-          </div>
-        </div>`
+        title:"🔑 The Golden Rule",
+        body:`<strong>Whatever you do to one side, you MUST do to the other side!</strong><br><br>
+        This keeps the scale balanced. Our goal is always to get the variable <strong>alone</strong> on one side.`,
+        visual:`<div class="visual-box"><p style="color:var(--muted);margin-bottom:10px">Solving x + 3 = 7 — subtract 3 from BOTH sides:</p><div class="equation-box" style="font-size:1.2rem">x + 3 <span style="color:var(--star)">&nbsp;=&nbsp;</span> 7<br><span style="color:#f472b6">− 3</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#f472b6">− 3</span><br><span style="border-top:2px solid rgba(255,255,255,.3);padding-top:8px;display:inline-block">x <span style="color:var(--star)">&nbsp;=&nbsp;</span> <span style="color:var(--green)">4 ✅</span></span></div></div>`
       },
       {
-        title: "🔄 Inverse Operations",
-        body: `To <em>undo</em> what's been done to x, use the <strong>opposite (inverse) operation</strong>:<br><br>
-        ➕ Addition is undone by ➖ Subtraction<br>
-        ➖ Subtraction is undone by ➕ Addition<br>
-        ✖️ Multiplication is undone by ➗ Division<br>
-        ➗ Division is undone by ✖️ Multiplication<br><br>
-        Think of it like putting your shoes on — to undo it, you take them off!`,
-        visual: `<div class="visual-box">
-          <div class="var-demo" style="gap:20px">
-            <div style="text-align:center;background:rgba(124,58,237,.2);border-radius:14px;padding:12px 16px">
-              <div style="font-size:1.3rem;margin-bottom:6px">x <strong>+ 5</strong> = 12</div>
-              <div style="color:#f472b6;font-size:.9rem">→ subtract 5</div>
-              <div style="font-size:1.1rem;margin-top:6px;color:var(--green)">x = 7 ✅</div>
-            </div>
-            <div style="text-align:center;background:rgba(6,182,212,.2);border-radius:14px;padding:12px 16px">
-              <div style="font-size:1.3rem;margin-bottom:6px"><strong>3</strong>x = 15</div>
-              <div style="color:#f472b6;font-size:.9rem">→ divide by 3</div>
-              <div style="font-size:1.1rem;margin-top:6px;color:var(--green)">x = 5 ✅</div>
-            </div>
-          </div>
-        </div>`
+        title:"🔄 Inverse Operations",
+        body:`Use the <strong>opposite operation</strong> to isolate x:<br><br>
+        ➕ Addition → undo with ➖ Subtraction<br>
+        ➖ Subtraction → undo with ➕ Addition<br>
+        ✖️ Multiplication → undo with ➗ Division<br>
+        ➗ Division → undo with ✖️ Multiplication`,
+        visual:`<div class="visual-box"><div class="var-demo" style="gap:20px"><div style="text-align:center;background:rgba(124,58,237,.2);border-radius:14px;padding:12px 16px"><div style="font-size:1.3rem;margin-bottom:6px">x <strong>+ 5</strong> = 12</div><div style="color:#f472b6;font-size:.9rem">→ subtract 5 from both sides</div><div style="font-size:1.1rem;margin-top:6px;color:var(--green)">x = 7 ✅</div></div><div style="text-align:center;background:rgba(6,182,212,.2);border-radius:14px;padding:12px 16px"><div style="font-size:1.3rem;margin-bottom:6px"><strong>3</strong>x = 15</div><div style="color:#f472b6;font-size:.9rem">→ divide both sides by 3</div><div style="font-size:1.1rem;margin-top:6px;color:var(--green)">x = 5 ✅</div></div></div></div>`
       }
     ],
-    practice: [
-      { q:"Solve: x + 5 = 12", ans:7, opts:[6,7,8,17], hint:"Subtract 5 from both sides",
-        explanation:`<strong>How to solve x + 5 = 12:</strong><br>
-        x has had 5 <em>added</em> to it, so we <em>subtract</em> 5 from both sides (inverse operation).<br>
-        • Left side: x + 5 − 5 = x<br>
-        • Right side: 12 − 5 = 7<br>
-        • Result: <strong style="color:var(--star)">x = 7 ✅</strong><br><br>
-        Check: 7 + 5 = 12 ✓ The scale balances!` },
-      { q:"Solve: n − 3 = 9", ans:12, opts:[6,12,3,11], hint:"Add 3 to both sides",
-        explanation:`<strong>How to solve n − 3 = 9:</strong><br>
-        n has had 3 <em>subtracted</em>, so we <em>add</em> 3 to both sides.<br>
-        • Left side: n − 3 + 3 = n<br>
-        • Right side: 9 + 3 = 12<br>
-        • Result: <strong style="color:var(--star)">n = 12 ✅</strong><br><br>
-        Check: 12 − 3 = 9 ✓` },
-      { q:"Solve: 4x = 20", ans:5, opts:[4,5,16,24], hint:"Divide both sides by 4",
-        explanation:`<strong>How to solve 4x = 20:</strong><br>
-        x has been <em>multiplied</em> by 4, so we <em>divide</em> both sides by 4.<br>
-        • Left side: 4x ÷ 4 = x<br>
-        • Right side: 20 ÷ 4 = 5<br>
-        • Result: <strong style="color:var(--star)">x = 5 ✅</strong><br><br>
-        Check: 4 × 5 = 20 ✓` },
-      { q:"Solve: y ÷ 3 = 6", ans:18, opts:[2,9,18,3], hint:"Multiply both sides by 3",
-        explanation:`<strong>How to solve y ÷ 3 = 6:</strong><br>
-        y has been <em>divided</em> by 3, so we <em>multiply</em> both sides by 3.<br>
-        • Left side: (y ÷ 3) × 3 = y<br>
-        • Right side: 6 × 3 = 18<br>
-        • Result: <strong style="color:var(--star)">y = 18 ✅</strong><br><br>
-        Check: 18 ÷ 3 = 6 ✓` },
-      { q:"Solve: x + 11 = 20", ans:9, opts:[9,10,31,8], hint:"Subtract 11 from both sides",
-        explanation:`<strong>How to solve x + 11 = 20:</strong><br>
-        x has had 11 <em>added</em>, so we <em>subtract</em> 11 from both sides.<br>
-        • Left side: x + 11 − 11 = x<br>
-        • Right side: 20 − 11 = 9<br>
-        • Result: <strong style="color:var(--star)">x = 9 ✅</strong><br><br>
-        Check: 9 + 11 = 20 ✓` },
+    practice:[
+      { q:"Solve: x + 5 = 12", ans:7, opts:[6,7,8,17], hint:"Step 1: x has +5, so subtract 5 from both sides\nStep 2: x = 12 − 5 = 7",
+        explanation:`<strong>Solve x + 5 = 12:</strong><br>• Subtract 5 from both sides: x = 12 − 5<br>• Answer: <strong style="color:var(--star)">x = 7 ✅</strong><br>Check: 7 + 5 = 12 ✓` },
+      { q:"Solve: n − 3 = 9", ans:12, opts:[6,12,3,11], hint:"Step 1: n has −3, so add 3 to both sides\nStep 2: n = 9 + 3 = 12",
+        explanation:`<strong>Solve n − 3 = 9:</strong><br>• Add 3 to both sides: n = 9 + 3<br>• Answer: <strong style="color:var(--star)">n = 12 ✅</strong>` },
+      { q:"Solve: 4x = 20", ans:5, opts:[4,5,16,24], hint:"Step 1: x is multiplied by 4, so divide both sides by 4\nStep 2: x = 20 ÷ 4 = 5",
+        explanation:`<strong>Solve 4x = 20:</strong><br>• Divide both sides by 4: x = 20 ÷ 4<br>• Answer: <strong style="color:var(--star)">x = 5 ✅</strong>` },
+      { q:"Solve: y ÷ 3 = 6", ans:18, opts:[2,9,18,3], hint:"Step 1: y is divided by 3, so multiply both sides by 3\nStep 2: y = 6 × 3 = 18",
+        explanation:`<strong>Solve y ÷ 3 = 6:</strong><br>• Multiply both sides by 3: y = 6 × 3<br>• Answer: <strong style="color:var(--star)">y = 18 ✅</strong>` },
+      { q:"Solve: x + 11 = 20", ans:9, opts:[9,10,31,8], hint:"Step 1: x has +11, so subtract 11 from both sides\nStep 2: x = 20 − 11 = 9",
+        explanation:`<strong>Solve x + 11 = 20:</strong><br>• Subtract 11: x = 20 − 11<br>• Answer: <strong style="color:var(--star)">x = 9 ✅</strong>` }
     ],
-    quiz: [
+    quiz:[
       { q:"Solve: x + 6 = 15", ans:9, opts:[7,8,9,21] },
       { q:"Solve: y − 4 = 11", ans:15, opts:[7,14,15,44] },
       { q:"Solve: 5n = 35", ans:7, opts:[6,7,30,40] },
       { q:"Solve: x ÷ 4 = 8", ans:32, opts:[2,12,32,4] },
-      { q:"Solve: x + 3 = 3", ans:0, opts:[0,1,6,3] },
+      { q:"Solve: x + 3 = 3", ans:0, opts:[0,1,6,3] }
     ]
   },
+
   3: {
-    title: "Two-Step Equations",
-    icon: "🧮",
-    learn: [
+    title:"Two-Step Equations", icon:"🧮",
+    learn:[
       {
-        title: "🪜 Two Steps — Work Backwards!",
-        body: `Some equations need <strong>two operations</strong> to solve. The trick is to work backwards — undo operations in <em>reverse order</em>.<br><br>
-        Think of it like getting dressed: you put on socks <em>then</em> shoes. To undo it, you take off shoes <em>first</em>, then socks. Same idea here!<br><br>
-        <strong>The order to undo:</strong><br>
-        1️⃣ First, undo any <strong>addition or subtraction</strong><br>
-        2️⃣ Then, undo any <strong>multiplication or division</strong>`,
-        visual: `<div class="visual-box">
-          <p style="color:var(--muted);margin-bottom:8px">Solve: <strong>2x + 3 = 11</strong></p>
-          <div class="equation-box" style="font-size:1.1rem">
-            2x + 3 = 11<br>
-            <span style="color:#f472b6">Step 1:</span> Subtract 3 → 2x = 8<br>
-            <span style="color:#a78bfa">Step 2:</span> Divide by 2 → <span style="color:var(--star)">x = 4 ✅</span>
-          </div>
-        </div>`
+        title:"🪜 Two Steps — Work Backwards!",
+        body:`Some equations need <strong>two operations</strong> to solve. Work backwards — undo operations in <em>reverse order</em>.<br><br>
+        Think of it like getting dressed: socks first, then shoes. To undo it, shoes come off first, then socks!<br><br>
+        <strong>Undo order:</strong><br>
+        1️⃣ First undo any <strong>addition or subtraction</strong><br>
+        2️⃣ Then undo any <strong>multiplication or division</strong>`,
+        visual:`<div class="visual-box"><p style="color:var(--muted);margin-bottom:8px">Solve: <strong>2x + 3 = 11</strong></p><div class="equation-box" style="font-size:1.1rem">2x + 3 = 11<br><span style="color:#f472b6">Step 1:</span> Subtract 3 → 2x = 8<br><span style="color:#a78bfa">Step 2:</span> Divide by 2 → <span style="color:var(--star)">x = 4 ✅</span></div></div>`
       },
       {
-        title: "🧩 Why This Order?",
-        body: `In the expression <span class="highlight">2x + 3</span>, here's what happened to x:<br><br>
-        1. x was <strong>multiplied by 2</strong> first (giving 2x)<br>
-        2. Then <strong>3 was added</strong> (giving 2x + 3)<br><br>
-        To undo this, we reverse the order — undo the +3 first, <em>then</em> undo the ×2.<br><br>
-        ⚠️ Remember: always apply the same operation to <strong>both sides</strong> of the equation!`,
-        visual: `<div class="visual-box">
-          <div style="display:flex;flex-direction:column;gap:8px">
-            <div style="background:rgba(244,114,182,.15);border-radius:10px;padding:10px;display:flex;align-items:center;gap:10px">
-              <span style="font-size:1.4rem">🚶</span>
-              <span>x started as a mystery number</span>
-            </div>
-            <div style="background:rgba(167,139,250,.15);border-radius:10px;padding:10px;display:flex;align-items:center;gap:10px">
-              <span style="font-size:1.4rem">✖️</span>
-              <span>Multiplied by 2 → became 2x</span>
-            </div>
-            <div style="background:rgba(251,146,60,.15);border-radius:10px;padding:10px;display:flex;align-items:center;gap:10px">
-              <span style="font-size:1.4rem">➕</span>
-              <span>Added 3 → became 2x + 3 = 11</span>
-            </div>
-            <div style="color:var(--teal);text-align:center;font-size:.9rem;padding-top:4px">↓ Now reverse: subtract 3 first, then divide by 2</div>
-          </div>
-        </div>`
-      },
-      {
-        title: "✅ Always Check Your Answer",
-        body: `After solving, <strong>substitute your answer back</strong> into the original equation. If both sides equal the same number, you're correct! This is called <em>verification</em> and good mathematicians always do it.<br><br>
-        It takes 5 seconds and saves you from silly mistakes!`,
-        visual: `<div class="visual-box">
-          <p style="color:var(--muted);margin-bottom:8px">We found x = 4 for 2x + 3 = 11. Let's check:</p>
-          <div class="equation-box" style="font-size:1.2rem">
-            2 × <span style="color:#f472b6">4</span> + 3<br>
-            = 8 + 3<br>
-            = <span style="color:var(--green)">11 ✅ Matches the right side!</span>
-          </div>
-          <p style="color:var(--muted);font-size:.85rem;margin-top:8px">If it didn't equal 11, we'd know we made a mistake!</p>
-        </div>`
+        title:"✅ Always Check Your Answer",
+        body:`After solving, <strong>substitute your answer back</strong> into the original equation. If both sides are equal, you're right!`,
+        visual:`<div class="visual-box"><p style="color:var(--muted);margin-bottom:8px">Check x = 4 in 2x + 3 = 11:</p><div class="equation-box" style="font-size:1.2rem">2 × <span style="color:#f472b6">4</span> + 3 = 8 + 3 = <span style="color:var(--green)">11 ✅</span></div></div>`
       }
     ],
-    practice: [
-      { q:"Solve: 2x + 1 = 9", ans:4, opts:[4,5,3,10], hint:"Subtract 1, then divide by 2",
-        explanation:`<strong>How to solve 2x + 1 = 9:</strong><br>
-        This has TWO operations — undo them in reverse order!<br>
-        • <strong>Step 1 — Undo the +1</strong> (subtract 1 from both sides): 2x = 8<br>
-        • <strong>Step 2 — Undo the ×2</strong> (divide both sides by 2): x = 4<br>
-        • Result: <strong style="color:var(--star)">x = 4 ✅</strong><br><br>
-        Check: 2 × 4 + 1 = 8 + 1 = 9 ✓` },
-      { q:"Solve: 3n − 2 = 13", ans:5, opts:[5,4,11,37], hint:"Add 2, then divide by 3",
-        explanation:`<strong>How to solve 3n − 2 = 13:</strong><br>
-        • <strong>Step 1 — Undo the −2</strong> (add 2 to both sides): 3n = 15<br>
-        • <strong>Step 2 — Undo the ×3</strong> (divide both sides by 3): n = 5<br>
-        • Result: <strong style="color:var(--star)">n = 5 ✅</strong><br><br>
-        Check: 3 × 5 − 2 = 15 − 2 = 13 ✓` },
-      { q:"Solve: 4y + 8 = 20", ans:3, opts:[3,4,7,28], hint:"Subtract 8, then divide by 4",
-        explanation:`<strong>How to solve 4y + 8 = 20:</strong><br>
-        • <strong>Step 1 — Undo the +8</strong> (subtract 8 from both sides): 4y = 12<br>
-        • <strong>Step 2 — Undo the ×4</strong> (divide both sides by 4): y = 3<br>
-        • Result: <strong style="color:var(--star)">y = 3 ✅</strong><br><br>
-        Check: 4 × 3 + 8 = 12 + 8 = 20 ✓` },
-      { q:"Solve: 5x − 5 = 20", ans:5, opts:[5,3,4,25], hint:"Add 5, then divide by 5",
-        explanation:`<strong>How to solve 5x − 5 = 20:</strong><br>
-        • <strong>Step 1 — Undo the −5</strong> (add 5 to both sides): 5x = 25<br>
-        • <strong>Step 2 — Undo the ×5</strong> (divide both sides by 5): x = 5<br>
-        • Result: <strong style="color:var(--star)">x = 5 ✅</strong><br><br>
-        Check: 5 × 5 − 5 = 25 − 5 = 20 ✓` },
-      { q:"Solve: 2x + 10 = 24", ans:7, opts:[7,6,17,34], hint:"Subtract 10, then divide by 2",
-        explanation:`<strong>How to solve 2x + 10 = 24:</strong><br>
-        • <strong>Step 1 — Undo the +10</strong> (subtract 10 from both sides): 2x = 14<br>
-        • <strong>Step 2 — Undo the ×2</strong> (divide both sides by 2): x = 7<br>
-        • Result: <strong style="color:var(--star)">x = 7 ✅</strong><br><br>
-        Check: 2 × 7 + 10 = 14 + 10 = 24 ✓` },
+    practice:[
+      { q:"Solve: 2x + 1 = 9", ans:4, opts:[4,5,3,10], hint:"Step 1: Subtract 1 from both sides → 2x = 8\nStep 2: Divide by 2 → x = 4",
+        explanation:`<strong>Solve 2x + 1 = 9:</strong><br>• Step 1 — subtract 1: 2x = 8<br>• Step 2 — divide by 2: x = 4<br>• <strong style="color:var(--star)">x = 4 ✅</strong> &nbsp; Check: 2×4+1=9 ✓` },
+      { q:"Solve: 3n − 2 = 13", ans:5, opts:[5,4,11,37], hint:"Step 1: Add 2 to both sides → 3n = 15\nStep 2: Divide by 3 → n = 5",
+        explanation:`<strong>Solve 3n − 2 = 13:</strong><br>• Step 1 — add 2: 3n = 15<br>• Step 2 — divide by 3: n = 5<br>• <strong style="color:var(--star)">n = 5 ✅</strong>` },
+      { q:"Solve: 4y + 8 = 20", ans:3, opts:[3,4,7,28], hint:"Step 1: Subtract 8 → 4y = 12\nStep 2: Divide by 4 → y = 3",
+        explanation:`<strong>Solve 4y + 8 = 20:</strong><br>• Step 1 — subtract 8: 4y = 12<br>• Step 2 — divide by 4: y = 3<br>• <strong style="color:var(--star)">y = 3 ✅</strong>` },
+      { q:"Solve: 5x − 5 = 20", ans:5, opts:[5,3,4,25], hint:"Step 1: Add 5 to both sides → 5x = 25\nStep 2: Divide by 5 → x = 5",
+        explanation:`<strong>Solve 5x − 5 = 20:</strong><br>• Step 1 — add 5: 5x = 25<br>• Step 2 — divide by 5: x = 5<br>• <strong style="color:var(--star)">x = 5 ✅</strong>` },
+      { q:"Solve: 2x + 10 = 24", ans:7, opts:[7,6,17,34], hint:"Step 1: Subtract 10 → 2x = 14\nStep 2: Divide by 2 → x = 7",
+        explanation:`<strong>Solve 2x + 10 = 24:</strong><br>• Step 1 — subtract 10: 2x = 14<br>• Step 2 — divide by 2: x = 7<br>• <strong style="color:var(--star)">x = 7 ✅</strong>` }
     ],
-    quiz: [
+    quiz:[
       { q:"Solve: 2x + 3 = 11", ans:4, opts:[3,4,5,7] },
       { q:"Solve: 4n − 2 = 14", ans:4, opts:[3,4,5,16] },
       { q:"Solve: 3y + 9 = 24", ans:5, opts:[4,5,6,11] },
       { q:"Solve: 5x + 5 = 30", ans:5, opts:[5,6,7,25] },
-      { q:"Solve: 2n − 6 = 10", ans:8, opts:[7,8,9,2] },
+      { q:"Solve: 2n − 6 = 10", ans:8, opts:[7,8,9,2] }
+    ]
+  },
+
+  4: {
+    title:"Inequalities", icon:"📊",
+    learn:[
+      {
+        title:"📊 What is an Inequality?",
+        body:`An <strong>inequality</strong> compares two values and shows that one is bigger or smaller. Instead of = we use:<br><br>
+        <span class="highlight">&lt;</span> <strong>less than</strong> — e.g. "3 is less than 7" → 3 &lt; 7<br>
+        <span class="highlight">&gt;</span> <strong>greater than</strong> — e.g. "9 is greater than 4" → 9 &gt; 4<br>
+        <span class="highlight">≤</span> <strong>less than or equal to</strong><br>
+        <span class="highlight">≥</span> <strong>greater than or equal to</strong><br><br>
+        🐊 <strong>Memory trick:</strong> The symbol always opens towards the <em>bigger</em> number — like a hungry crocodile opening its mouth towards the bigger meal!`,
+        visual:`<div class="visual-box"><div style="font-size:2.5rem;text-align:center;letter-spacing:8px">🐊 &lt; 🦕</div><p style="color:var(--muted);margin-top:8px">The mouth opens towards the bigger dinosaur!</p><div class="equation-box" style="font-size:1.4rem">x + 3 &gt; 7 &nbsp;means&nbsp; x &gt; 4</div></div>`
+      },
+      {
+        title:"🔑 Solving Inequalities",
+        body:`Solve inequalities <strong>just like equations</strong> — do the same thing to both sides!<br><br>
+        ⚠️ <strong>One special rule:</strong> If you multiply or divide by a <em>negative number</em>, you must <strong>flip the sign</strong>!<br><br>
+        e.g. −2x &lt; 6 → divide by −2 → x &gt; −3 (sign flips!)`,
+        visual:`<div class="visual-box"><p style="color:var(--muted);margin-bottom:8px">Solve: x + 3 &gt; 7</p><div class="equation-box" style="font-size:1.2rem">x + 3 &gt; 7<br>Subtract 3 from both sides:<br><span style="color:var(--star)">x &gt; 4</span></div><p style="color:var(--muted);margin-top:8px">x can be 5, 6, 7, 100... any number bigger than 4!</p></div>`
+      },
+      {
+        title:"📏 Open & Closed Circles on Number Lines",
+        body:`We show inequality answers on a <strong>number line</strong>. The circle type tells us whether the boundary number is included:<br><br>
+        ⭕ <strong>Open circle ○</strong> — boundary number is <em>NOT</em> included. Used with <span class="highlight">&lt;</span> and <span class="highlight">&gt;</span>.<br><br>
+        🔵 <strong>Closed circle ●</strong> — boundary number <em>IS</em> included. Used with <span class="highlight">≤</span> and <span class="highlight">≥</span>.<br><br>
+        Then draw an arrow in the direction of all solutions.`,
+        visual:`<div class="visual-box"><div style="margin-bottom:16px"><p style="color:#f472b6;font-weight:700;margin-bottom:6px">x &gt; 3 → Open circle (3 not included), arrow right:</p><div style="display:flex;align-items:center;gap:0;font-family:'Fredoka One',cursive;font-size:1rem;justify-content:center"><span style="color:var(--muted)">←—1—2—</span><span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border:3px solid #f472b6;border-radius:50%;color:#f472b6;font-size:.85rem;margin:0 1px">3</span><span style="color:#f472b6">—4—5—6—→</span></div><p style="color:var(--muted);font-size:.82rem;margin-top:4px">Empty circle = 3 is NOT a solution</p></div><div style="border-top:1px solid rgba(255,255,255,.1);padding-top:14px"><p style="color:#06b6d4;font-weight:700;margin-bottom:6px">x ≤ 5 → Closed circle (5 included), arrow left:</p><div style="display:flex;align-items:center;gap:0;font-family:'Fredoka One',cursive;font-size:1rem;justify-content:center"><span style="color:#06b6d4">←—2—3—4—</span><span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:#06b6d4;border-radius:50%;color:#fff;font-size:.85rem;margin:0 1px">5</span><span style="color:var(--muted)">—6—7—→</span></div><p style="color:var(--muted);font-size:.82rem;margin-top:4px">Filled circle = 5 IS a solution</p></div><div style="background:rgba(249,231,132,.1);border:1px solid rgba(249,231,132,.3);border-radius:12px;padding:10px;margin-top:14px;font-size:.9rem"><strong style="color:var(--star)">Quick rule:</strong> &lt; and &gt; → open ○ &nbsp;|&nbsp; ≤ and ≥ → closed ●</div></div>`
+      },
+      {
+        title:"↔️ Range Inequalities",
+        body:`Sometimes a value is <strong>between two numbers</strong>. We write this as a range using two inequality signs at once:<br><br>
+        <span class="highlight">2 &lt; x ≤ 10</span> means x is <em>greater than 2</em> AND <em>less than or equal to 10</em>.<br><br>
+        So x could be 3, 4, 5, 6, 7, 8, 9, or 10 — but NOT 2 itself!<br><br>
+        On a number line: open circle at 2, closed circle at 10, shaded line between them.`,
+        visual:`<div class="visual-box"><p style="color:var(--star);font-weight:700;margin-bottom:10px">2 &lt; x ≤ 10 on a number line:</p><div style="display:flex;align-items:center;justify-content:center;font-family:'Fredoka One',cursive;font-size:.95rem;flex-wrap:wrap;gap:2px"><span style="color:var(--muted)">0—1—</span><span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border:3px solid #f472b6;border-radius:50%;color:#f472b6;font-size:.8rem">2</span><span style="color:var(--teal)">—3—4—5—6—7—8—9—</span><span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;background:#06b6d4;border-radius:50%;color:#fff;font-size:.8rem">10</span><span style="color:var(--muted)">—11</span></div><div style="margin-top:12px;display:flex;gap:16px;justify-content:center;font-size:.88rem;flex-wrap:wrap"><div style="color:#f472b6">○ at 2 (open — NOT included)</div><div style="color:#06b6d4">● at 10 (closed — IS included)</div></div><p style="color:var(--muted);font-size:.85rem;margin-top:8px">The shaded region between them shows all valid values of x.</p></div>`
+      }
+    ],
+    practice:[
+      { q:"Is 5 > 3 true or false?", ans:"True", opts:["True","False","Maybe","Can't tell"], hint:"Count on a number line — does 5 come after 3?",
+        explanation:`<strong>5 > 3</strong> means "5 is greater than 3." On a number line 5 comes after 3, so yes — <strong style="color:var(--star)">True ✅</strong>` },
+      { q:"Solve: x + 2 > 8. What is x?", ans:"x > 6", opts:["x > 6","x > 10","x < 6","x = 6"],
+        hint:"Step 1: Subtract 2 from both sides\nStep 2: x > 8 − 2 = 6",
+        explanation:`<strong>Solve x + 2 > 8:</strong><br>• Subtract 2 from both sides: x > 8 − 2<br>• Answer: <strong style="color:var(--star)">x > 6 ✅</strong><br>x can be 7, 8, 9... any number bigger than 6!` },
+      { q:"Solve: x − 3 ≤ 5. What is x?", ans:"x ≤ 8", opts:["x ≤ 8","x ≤ 2","x ≥ 8","x < 8"],
+        hint:"Step 1: Add 3 to both sides\nStep 2: x ≤ 5 + 3 = 8",
+        explanation:`<strong>Solve x − 3 ≤ 5:</strong><br>• Add 3 to both sides: x ≤ 5 + 3<br>• Answer: <strong style="color:var(--star)">x ≤ 8 ✅</strong><br>≤ means x can equal 8 too — closed circle on number line.` },
+      { q:"Does x = 4 satisfy x > 4?", ans:"No", opts:["No","Yes","Sometimes","Depends"],
+        hint:"x > 4 means STRICTLY greater than 4 — does 4 > 4?",
+        explanation:`<strong>x > 4 means strictly greater than 4.</strong><br>4 is NOT greater than itself (4 = 4, not 4 > 4).<br>Answer: <strong style="color:var(--star)">No ✅</strong> — use open circle at 4.` },
+      { q:"Solve: 2x < 12. What is x?", ans:"x < 6", opts:["x < 6","x < 10","x > 6","x = 6"],
+        hint:"Step 1: Divide both sides by 2 (positive, so sign stays)\nStep 2: x < 12 ÷ 2 = 6",
+        explanation:`<strong>Solve 2x < 12:</strong><br>• Divide both sides by 2: x < 6<br>• Answer: <strong style="color:var(--star)">x < 6 ✅</strong>` }
+    ],
+    quiz:[
+      { q:"What does x ≥ 5 mean?", ans:"x is 5 or more", opts:["x is 5 or more","x is less than 5","x equals 5","x is more than 5"] },
+      { q:"Solve: x + 4 > 10", ans:"x > 6", opts:["x > 6","x > 14","x < 6","x = 6"] },
+      { q:"Solve: x − 2 ≤ 7", ans:"x ≤ 9", opts:["x ≤ 9","x ≤ 5","x ≥ 9","x < 9"] },
+      { q:"For x > 3, which circle do we draw at 3?", ans:"Open circle ○", opts:["Open circle ○","Closed circle ●","No circle","A square"] },
+      { q:"In 2 < x ≤ 8, is x = 2 a solution?", ans:"No — open circle at 2", opts:["No — open circle at 2","Yes — it is included","Only if x is positive","Depends on context"] }
+    ]
+  },
+
+  5: {
+    title:"Like Terms & Simplifying", icon:"🔗",
+    learn:[
+      {
+        title:"🔗 What are Like Terms?",
+        body:`<strong>Like terms</strong> have the <em>same variable</em> raised to the <em>same power</em>. Only like terms can be added or subtracted.<br><br>
+        ✅ Like: 3x and 5x (both x), 2y² and 7y²<br>
+        ❌ Unlike: 3x and 5y (different variables), 2x and 2x² (different powers)<br><br>
+        🍎 Think of fruit — you can add apples to apples, but not apples to oranges!`,
+        visual:`<div class="visual-box"><div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap"><div style="background:rgba(124,58,237,.25);border-radius:12px;padding:10px 16px;text-align:center"><div style="font-size:1.4rem">🍎 3x + 🍎 5x</div><div style="color:var(--green);font-weight:700;margin-top:4px">= 8x ✅</div></div><div style="background:rgba(239,68,68,.15);border-radius:12px;padding:10px 16px;text-align:center"><div style="font-size:1.4rem">🍎 3x + 🍊 5y</div><div style="color:var(--red);font-weight:700;margin-top:4px">= 3x + 5y (can't combine)</div></div></div></div>`
+      },
+      {
+        title:"✂️ Simplifying Expressions",
+        body:`To <strong>simplify</strong>, collect all like terms:<br><br>
+        1. Identify like terms (same variable)<br>
+        2. Add or subtract their coefficients<br>
+        3. Keep the variable the same<br><br>
+        Example: 5x + 3y + 2x − y<br>
+        → x terms: 5x + 2x = <strong>7x</strong><br>
+        → y terms: 3y − y = <strong>2y</strong><br>
+        → Answer: <strong>7x + 2y</strong>`,
+        visual:`<div class="visual-box"><div class="equation-box" style="font-size:1.2rem"><span style="color:#a78bfa">5x</span> + <span style="color:#fb923c">3y</span> + <span style="color:#a78bfa">2x</span> − <span style="color:#fb923c">y</span></div><div style="margin:10px 0;color:var(--muted)">Group like terms:</div><div class="equation-box" style="font-size:1.2rem">(<span style="color:#a78bfa">5x + 2x</span>) + (<span style="color:#fb923c">3y − y</span>) = <span style="color:var(--star)">7x + 2y</span></div></div>`
+      },
+      {
+        title:"📦 The Distributive Property",
+        body:`When a number is <strong>outside brackets</strong>, multiply it by <em>everything inside</em>:<br><br>
+        <span class="highlight">a(b + c) = ab + ac</span><br><br>
+        Example: 3(x + 4) = 3×x + 3×4 = 3x + 12`,
+        visual:`<div class="visual-box"><div class="equation-box" style="font-size:1.3rem"><span style="color:#f472b6">2</span>(x + 3)</div><div style="margin:8px 0;color:var(--muted)">Multiply 2 by EACH term inside:</div><div class="equation-box" style="font-size:1.3rem"><span style="color:#f472b6">2</span>×x + <span style="color:#f472b6">2</span>×3 = <span style="color:var(--star)">2x + 6</span></div></div>`
+      }
+    ],
+    practice:[
+      { q:"Simplify: 4x + 3x", ans:"7x", opts:["7x","7","12x","4x3x"],
+        hint:"Step 1: Both are x terms (like terms)\nStep 2: Add coefficients: 4 + 3 = 7\nStep 3: Answer: 7x",
+        explanation:`<strong>Simplify 4x + 3x:</strong><br>• Both have variable x — like terms!<br>• Add coefficients: 4 + 3 = 7<br>• Answer: <strong style="color:var(--star)">7x ✅</strong>` },
+      { q:"Simplify: 8y − 3y", ans:"5y", opts:["5y","5","11y","8y3y"],
+        hint:"Step 1: Both are y terms\nStep 2: Subtract coefficients: 8 − 3 = 5\nStep 3: Answer: 5y",
+        explanation:`<strong>Simplify 8y − 3y:</strong><br>• Like terms (both y)<br>• Subtract: 8 − 3 = 5<br>• Answer: <strong style="color:var(--star)">5y ✅</strong>` },
+      { q:"Simplify: 3x + 2y + x", ans:"4x + 2y", opts:["4x + 2y","6xy","3x + 3y","5x + 2y"],
+        hint:"Step 1: Find x terms: 3x + x = 4x (remember x = 1x)\nStep 2: y terms: 2y (no other y to combine)\nStep 3: Answer: 4x + 2y",
+        explanation:`<strong>Simplify 3x + 2y + x:</strong><br>• x terms: 3x + x = 4x (x means 1x)<br>• y terms: 2y (alone)<br>• Answer: <strong style="color:var(--star)">4x + 2y ✅</strong>` },
+      { q:"Expand: 3(x + 4)", ans:"3x + 12", opts:["3x + 12","3x + 4","x + 12","3x + 7"],
+        hint:"Step 1: Multiply 3 × x = 3x\nStep 2: Multiply 3 × 4 = 12\nStep 3: Answer: 3x + 12",
+        explanation:`<strong>Expand 3(x + 4):</strong><br>• 3 × x = 3x<br>• 3 × 4 = 12<br>• Answer: <strong style="color:var(--star)">3x + 12 ✅</strong>` },
+      { q:"Simplify: 5a + 3b − 2a + b", ans:"3a + 4b", opts:["3a + 4b","7a + 2b","3a + 2b","5a + 4b"],
+        hint:"Step 1: a terms: 5a − 2a = 3a\nStep 2: b terms: 3b + b = 4b (b = 1b)\nStep 3: Answer: 3a + 4b",
+        explanation:`<strong>Simplify 5a + 3b − 2a + b:</strong><br>• a terms: 5a − 2a = 3a<br>• b terms: 3b + b = 4b<br>• Answer: <strong style="color:var(--star)">3a + 4b ✅</strong>` }
+    ],
+    quiz:[
+      { q:"Simplify: 6x + 2x", ans:"8x", opts:["8x","8","12x","6x+2x"] },
+      { q:"Simplify: 9y − 4y", ans:"5y", opts:["5y","5","13y","4y"] },
+      { q:"Expand: 4(x + 3)", ans:"4x + 12", opts:["4x + 12","4x + 3","x + 12","4x + 7"] },
+      { q:"Simplify: 2x + 5y + 3x", ans:"5x + 5y", opts:["5x + 5y","10xy","5x + y","2x + 8y"] },
+      { q:"Are 3x and 3x² like terms?", ans:"No — different powers", opts:["No — different powers","Yes","Only when x=1","Sometimes"] }
+    ]
+  },
+
+  6: {
+    title:"Word Problems", icon:"📝",
+    learn:[
+      {
+        title:"📝 Turning Words into Algebra",
+        body:`Word problems describe real situations. Your job is to translate the words into an equation, then solve it!<br><br>
+        Here are the key translations. Notice how each example uses a full sentence to show the meaning:<br><br>
+        🔹 <u>More than</u> → <strong>+</strong><br>
+        &nbsp;&nbsp;"<em>A is 3 more than B</em>" means A = B + 3<br><br>
+        🔹 <u>Less than</u> → <strong>−</strong><br>
+        &nbsp;&nbsp;"<em>A is 4 less than B</em>" means A = B − 4<br><br>
+        🔹 <u>Times as many</u> → <strong>×</strong><br>
+        &nbsp;&nbsp;"<em>A is 3 times B</em>" means A = 3 × B<br><br>
+        🔹 <u>Shared equally</u> / per → <strong>÷</strong><br>
+        &nbsp;&nbsp;"<em>A is split equally among 4</em>" means A ÷ 4<br><br>
+        🔹 <u>Is / equals / gives</u> → <strong>=</strong><br>
+        🔹 <u>A number / some / unknown</u> → <strong>x</strong>`,
+        visual:`<div class="visual-box"><p style="color:var(--muted);margin-bottom:8px">Try translating this sentence:</p><div class="equation-box" style="font-size:1rem">"A number is 5 <u>more than</u> 3"</div><div style="margin-top:10px;color:var(--muted)">↓ "more than" = +, "a number" = x</div><div class="equation-box" style="font-size:1.2rem;color:var(--star)">x = 3 + 5 → x = 8 ✅</div></div>`
+      },
+      {
+        title:"🪜 Step-by-Step: Emma & Tom",
+        body:`Let's work through a classic word problem slowly:<br><br>
+        <em>"Emma has 3 more sweets than Tom. Together they have 15 sweets. How many does each have?"</em><br><br>
+        <strong style="color:#a78bfa">Step 1 — Define:</strong> We don't know how many Tom has, so let <strong>Tom = x</strong>.<br><br>
+        <strong style="color:#34d399">Step 2 — Translate:</strong> Emma has 3 MORE than Tom, so <strong>Emma = x + 3</strong>.<br><br>
+        <strong style="color:#fb923c">Step 3 — Write the equation:</strong> Tom + Emma = 15, so we replace Tom with x and Emma with (x + 3):<br>
+        x + (x + 3) = 15`,
+        visual:`<div class="visual-box"><div class="equation-box" style="font-size:1.1rem">Tom + Emma = 15<br>↓ replace Tom with x<br>x + Emma = 15<br>↓ replace Emma with (x + 3)<br><span style="color:var(--star)">x + (x + 3) = 15</span></div></div>`
+      },
+      {
+        title:"🎯 Finishing the Solution",
+        body:`We had: <strong>x + (x + 3) = 15</strong><br><br>
+        <strong style="color:#a78bfa">Step 4 — Simplify:</strong> x + x + 3 = 15 → 2x + 3 = 15<br><br>
+        <strong style="color:#34d399">Step 5 — Solve:</strong><br>
+        Subtract 3 from both sides: 2x = 12<br>
+        Divide both sides by 2: x = 6<br><br>
+        <strong style="color:#fb923c">Step 6 — Check:</strong> Tom = 6, Emma = 6 + 3 = 9<br>
+        6 + 9 = 15 ✅`,
+        visual:`<div class="visual-box"><div class="equation-box" style="font-size:1.1rem">2x + 3 = 15<br>−3 both sides → 2x = 12<br>÷2 both sides → x = 6<br><span style="color:var(--star)">Tom = 6, Emma = 9 ✅</span></div></div>`
+      }
+    ],
+    practice:[
+      { q:"A number plus 8 equals 20. What is the number?", ans:12, opts:[12,28,8,10],
+        hint:"Step 1: Let x = the number\nStep 2: Write x + 8 = 20\nStep 3: Subtract 8 → x = 12",
+        explanation:`<strong>Let x = the number.</strong><br>• Write: x + 8 = 20<br>• Subtract 8: x = 20 − 8 = 12<br>• <strong style="color:var(--star)">x = 12 ✅</strong> &nbsp; Check: 12 + 8 = 20 ✓` },
+      { q:"Sam has 3 times as many stickers as Jo. Sam has 18. How many does Jo have?", ans:6, opts:[6,15,54,21],
+        hint:"Step 1: Let Jo = x\nStep 2: Sam = 3x = 18\nStep 3: Divide both sides by 3 → x = 6",
+        explanation:`<strong>Let Jo = x.</strong><br>• Sam has 3 times Jo: 3x = 18<br>• Divide by 3: x = 6<br>• <strong style="color:var(--star)">Jo has 6 ✅</strong>` },
+      { q:"Two numbers add up to 30. One is 12. What is the other?", ans:18, opts:[18,42,12,20],
+        hint:"Step 1: Let the unknown = x\nStep 2: x + 12 = 30\nStep 3: Subtract 12 → x = 18",
+        explanation:`<strong>Let x = the other number.</strong><br>• Write: x + 12 = 30<br>• Subtract 12: x = 18<br>• <strong style="color:var(--star)">18 ✅</strong>` },
+      { q:"A bag of sweets costs £x. 4 bags cost £28. What is x?", ans:7, opts:[7,24,32,4],
+        hint:"Step 1: Write 4x = 28\nStep 2: Divide both sides by 4 → x = 7",
+        explanation:`<strong>4 bags cost £28.</strong><br>• Write: 4x = 28<br>• Divide by 4: x = 7<br>• <strong style="color:var(--star)">£7 per bag ✅</strong>` },
+      { q:"Emma is 3 more than twice her brother's age. Her brother is 4. How old is Emma?", ans:11, opts:[11,9,14,8],
+        hint:"Step 1: Twice brother's age = 2 × 4 = 8\nStep 2: 3 more than that = 8 + 3 = 11",
+        explanation:`<strong>Brother = 4.</strong><br>• Twice brother's age: 2 × 4 = 8<br>• 3 more than that: 8 + 3 = 11<br>• <strong style="color:var(--star)">Emma is 11 ✅</strong>` }
+    ],
+    quiz:[
+      { q:"A number times 6 equals 42. What is the number?", ans:7, opts:[7,36,48,6] },
+      { q:"Tom has 4 more than Lisa. Lisa has 9. How many does Tom have?", ans:13, opts:[13,5,36,4] },
+      { q:"The sum of two numbers is 25. One is 11. What is the other?", ans:14, opts:[14,36,11,10] },
+      { q:"A number doubled minus 3 equals 11. What is the number?", ans:7, opts:[7,4,8,5] },
+      { q:"Three friends share £27 equally. How much does each get?", ans:9, opts:[9,8,27,24] }
+    ]
+  },
+
+  7: {
+    title:"Simultaneous Equations", icon:"🔀",
+    learn:[
+      {
+        title:"🔀 Two Equations, Two Unknowns",
+        body:`A <strong>simultaneous equation</strong> is when we have <em>two equations</em> that must both be true at the same time, and we need to find values for <em>two unknowns</em> (usually x and y).<br><br>
+        For example:<br>
+        &nbsp;&nbsp;x + y = 10 &nbsp;(Equation 1)<br>
+        &nbsp;&nbsp;x − y = 4 &nbsp;(Equation 2)<br><br>
+        We need to find the value of x AND the value of y that make <em>both</em> equations true simultaneously.<br><br>
+        In this case the answer is <strong>x = 7 and y = 3</strong>. You can check: 7+3=10 ✅ and 7−3=4 ✅. In the next pages we'll learn exactly how to find these answers!`,
+        visual:`<div class="visual-box"><div class="equation-box" style="font-size:1.2rem">x + y = 10 &nbsp; (Equation 1)<br>x − y = 4 &nbsp;&nbsp; (Equation 2)</div><p style="color:var(--muted);margin-top:8px">We need ONE value of x and ONE value of y<br>that works in BOTH equations at the same time.</p></div>`
+      },
+      {
+        title:"➕ Solving by Elimination",
+        body:`The <strong>elimination method</strong> adds or subtracts the two equations to remove one variable, making it much easier to solve.<br><br>
+        Here's how it works step by step:<br><br>
+        <strong style="color:#a78bfa">Step 1:</strong> Write both equations one above the other<br>
+        <strong style="color:#34d399">Step 2:</strong> Add the <em>left-hand sides</em> together and add the <em>right-hand sides</em> together. The y terms cancel out (y + −y = 0), leaving us with only x.<br>
+        <strong style="color:#fb923c">Step 3:</strong> Solve for x<br>
+        <strong style="color:#f472b6">Step 4:</strong> Substitute x back into either original equation to find y`,
+        visual:`<div class="visual-box"><div class="equation-box" style="font-size:1.05rem;text-align:left;padding:14px 20px">x + y = 10 &nbsp; (Eq. 1)<br><u>x − y = &nbsp;4</u> &nbsp;&nbsp; (Eq. 2) ← add left sides AND right sides<br><br>Left: x + y + x − y = 2x + 0 = <strong>2x</strong><br>Right: 10 + 4 = <strong>14</strong><br><br>So: 2x = 14 → <span style="color:#fb923c">x = 7</span><br><br>Sub into Eq.1: 7 + y = 10 → <span style="color:var(--star)">y = 3 ✅</span></div></div>`
+      },
+      {
+        title:"🔄 Solving by Substitution",
+        body:`The <strong>substitution method</strong> rearranges one equation to express one variable in terms of the other, then plugs it into the second equation.<br><br>
+        <strong style="color:#a78bfa">Step 1:</strong> Rearrange Equation 1: y = 10 − x<br>
+        <strong style="color:#34d399">Step 2:</strong> Substitute into Equation 2: x − (10 − x) = 4<br>
+        <strong style="color:#fb923c">Step 3:</strong> Expand — note that subtracting (10 − x) means −10 <strong>and</strong> −(−x). A minus times a minus makes a plus, so −(−x) becomes <strong>+x</strong>:<br>
+        &nbsp;&nbsp;x − 10 + x = 4 → 2x − 10 = 4<br>
+        <strong style="color:#f472b6">Step 4:</strong> Solve: 2x = 14 → x = 7, then y = 10 − 7 = 3`,
+        visual:`<div class="visual-box"><div class="equation-box" style="font-size:1.05rem;text-align:left;padding:14px 20px">From Eq.1: y = 10 − x<br><br>Substitute into Eq.2:<br>x − <span style="color:#f472b6">(10 − x)</span> = 4<br><br>Expand: x − 10 + x = 4<br>(because −(−x) = <strong>+x</strong>)<br><br>2x − 10 = 4 → 2x = 14<br><span style="color:var(--star)">x = 7, y = 3 ✅</span></div></div>`
+      }
+    ],
+    practice:[
+      { q:"x + y = 8 and x − y = 2. What is x?", ans:5, opts:[5,6,4,3],
+        hint:"Step 1: Add both equations (left sides together, right sides together)\nStep 2: (x+y) + (x−y) = 8+2 → 2x = 10\nStep 3: x = 5",
+        explanation:`<strong>Add the equations:</strong><br>• Left: (x+y) + (x−y) = 2x<br>• Right: 8 + 2 = 10<br>• So 2x = 10 → <strong style="color:var(--star)">x = 5 ✅</strong>` },
+      { q:"x + y = 8 and x − y = 2. What is y?", ans:3, opts:[3,5,6,2],
+        hint:"Step 1: Use x = 5 from previous question\nStep 2: Sub into x + y = 8: 5 + y = 8\nStep 3: y = 3",
+        explanation:`<strong>Sub x = 5 into x + y = 8:</strong><br>• 5 + y = 8<br>• y = 8 − 5 = <strong style="color:var(--star)">3 ✅</strong>` },
+      { q:"2x + y = 11 and x + y = 7. What is x?", ans:4, opts:[4,3,5,2],
+        hint:"Step 1: Subtract Eq.2 from Eq.1 (left sides and right sides)\nStep 2: (2x+y) − (x+y) = 11−7 → x = 4",
+        explanation:`<strong>Subtract Eq.2 from Eq.1:</strong><br>• (2x+y) − (x+y) = x<br>• 11 − 7 = 4<br>• <strong style="color:var(--star)">x = 4 ✅</strong>` },
+      { q:"2x + y = 11 and x + y = 7. What is y?", ans:3, opts:[3,7,4,5],
+        hint:"Step 1: Use x = 4\nStep 2: Sub into x + y = 7: 4 + y = 7\nStep 3: y = 3",
+        explanation:`<strong>Sub x = 4 into x + y = 7:</strong><br>• 4 + y = 7<br>• <strong style="color:var(--star)">y = 3 ✅</strong>` },
+      { q:"x + 2y = 10 and x − 2y = 2. What is x?", ans:6, opts:[6,4,8,2],
+        hint:"Step 1: Add both equations\nStep 2: Left: x+2y + x−2y = 2x, Right: 10+2 = 12\nStep 3: 2x = 12 → x = 6",
+        explanation:`<strong>Add the equations:</strong><br>• Left: 2x (the y terms cancel)<br>• Right: 10 + 2 = 12<br>• 2x = 12 → <strong style="color:var(--star)">x = 6 ✅</strong>` }
+    ],
+    quiz:[
+      { q:"x + y = 9 and x − y = 3. What is x?", ans:6, opts:[6,3,9,5] },
+      { q:"x + y = 9 and x − y = 3. What is y?", ans:3, opts:[3,6,9,4] },
+      { q:"3x + y = 13 and x + y = 7. What is x?", ans:3, opts:[3,6,4,2] },
+      { q:"3x + y = 13 and x + y = 7. What is y?", ans:4, opts:[4,3,6,7] },
+      { q:"Which method adds the two equations to cancel a variable?", ans:"Elimination", opts:["Elimination","Substitution","Factorisation","Expansion"] }
+    ]
+  },
+
+  8: {
+    title:"Graphing Linear Equations", icon:"📈",
+    learn:[
+      {
+        title:"📐 Coordinates — Points on a Graph",
+        body:`Before drawing lines, we need to understand <strong>coordinates</strong>. Every point on a graph has two numbers called an <strong>ordered pair</strong>: (x, y).<br><br>
+        • The <strong>x value</strong> tells you how far to go <em>left or right</em><br>
+        • The <strong>y value</strong> tells you how far to go <em>up or down</em><br><br>
+        The starting point (0, 0) is called the <strong>origin</strong>. Positive x goes right, negative x goes left. Positive y goes up, negative y goes down.`,
+        visual:`<svg viewBox="0 0 260 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:280px;display:block;margin:0 auto">
+  <rect width="260" height="220" fill="rgba(6,182,212,0.05)" rx="12"/>
+  <!-- Grid -->
+  <g stroke="rgba(255,255,255,0.1)" stroke-width="0.5">
+    <line x1="30" y1="30" x2="230" y2="30"/><line x1="30" y1="60" x2="230" y2="60"/>
+    <line x1="30" y1="90" x2="230" y2="90"/><line x1="30" y1="120" x2="230" y2="120"/>
+    <line x1="30" y1="150" x2="230" y2="150"/><line x1="30" y1="180" x2="230" y2="180"/>
+    <line x1="70" y1="20" x2="70" y2="200"/><line x1="110" y1="20" x2="110" y2="200"/>
+    <line x1="150" y1="20" x2="150" y2="200"/><line x1="190" y1="20" x2="190" y2="200"/>
+  </g>
+  <!-- Axes -->
+  <line x1="30" y1="120" x2="230" y2="120" stroke="#06b6d4" stroke-width="2"/>
+  <line x1="110" y1="20" x2="110" y2="200" stroke="#06b6d4" stroke-width="2"/>
+  <!-- Arrows -->
+  <polygon points="230,120 222,116 222,124" fill="#06b6d4"/>
+  <polygon points="110,20 106,28 114,28" fill="#06b6d4"/>
+  <!-- Labels -->
+  <text x="235" y="124" fill="#06b6d4" font-size="11" font-family="Fredoka One">x</text>
+  <text x="113" y="16" fill="#06b6d4" font-size="11" font-family="Fredoka One">y</text>
+  <!-- Axis numbers -->
+  <text x="105" y="135" fill="rgba(255,255,255,0.5)" font-size="9">0</text>
+  <text x="145" y="135" fill="rgba(255,255,255,0.5)" font-size="9">1</text>
+  <text x="185" y="135" fill="rgba(255,255,255,0.5)" font-size="9">2</text>
+  <text x="65" y="135" fill="rgba(255,255,255,0.5)" font-size="9">-1</text>
+  <text x="107" y="95" fill="rgba(255,255,255,0.5)" font-size="9">1</text>
+  <text x="107" y="65" fill="rgba(255,255,255,0.5)" font-size="9">2</text>
+  <text x="107" y="155" fill="rgba(255,255,255,0.5)" font-size="9">-1</text>
+  <!-- Points -->
+  <circle cx="150" cy="90" r="6" fill="#f9e784" stroke="#f97316" stroke-width="2"/>
+  <text x="158" y="85" fill="#f9e784" font-size="10" font-family="Fredoka One">(1,1)</text>
+  <circle cx="190" cy="60" r="6" fill="#ec4899" stroke="#fff" stroke-width="1.5"/>
+  <text x="196" y="56" fill="#ec4899" font-size="10" font-family="Fredoka One">(2,2)</text>
+  <circle cx="70" cy="150" r="6" fill="#a78bfa" stroke="#fff" stroke-width="1.5"/>
+  <text x="30" y="162" fill="#a78bfa" font-size="10" font-family="Fredoka One">(-1,-1)</text>
+  <!-- Origin label -->
+  <text x="195" y="195" fill="rgba(255,255,255,0.4)" font-size="9">origin (0,0)</text>
+  <circle cx="110" cy="120" r="4" fill="rgba(255,255,255,0.3)"/>
+</svg>`
+      },
+      {
+        title:"📈 y = mx + b — The Slope Formula",
+        body:`Every straight line can be written as:<br><br>
+        <span class="highlight" style="font-size:1.2rem">y = mx + b</span><br><br>
+        <strong style="color:#a78bfa">m</strong> = the <strong>slope</strong> — how steep the line is<br>
+        <strong style="color:#fb923c">b</strong> = the <strong>y-intercept</strong> — where the line crosses the y-axis (when x = 0)<br><br>
+        Example: y = 2x + 3 has slope = 2, y-intercept = 3 (the line starts at the point (0,3) on the y-axis).`,
+        visual:`<div class="visual-box"><div class="equation-box" style="font-size:1.6rem">y = <span style="color:#a78bfa">2</span>x + <span style="color:#fb923c">3</span></div><div style="display:flex;gap:16px;justify-content:center;margin-top:14px;flex-wrap:wrap"><div style="background:rgba(167,139,250,.2);border-radius:12px;padding:10px 16px;text-align:center"><div style="font-size:1.3rem;color:#a78bfa;font-weight:800">2</div><div style="font-size:.8rem;color:var(--muted)">Slope (m)</div><div style="font-size:.75rem;color:var(--muted)">up 2, right 1</div></div><div style="background:rgba(251,146,60,.2);border-radius:12px;padding:10px 16px;text-align:center"><div style="font-size:1.3rem;color:#fb923c;font-weight:800">3</div><div style="font-size:.8rem;color:var(--muted)">Y-intercept (b)</div><div style="font-size:.75rem;color:var(--muted)">crosses y-axis at 3</div></div></div></div>`
+      },
+      {
+        title:"⬆️ Understanding Slope — Steepness & Direction",
+        body:`The <strong>slope (m)</strong> tells you how much y changes for every 1 unit increase in x. Here's what different slopes look like:<br><br>
+        📈 <strong>Positive slope</strong> (e.g. m=1): gentle rise going right<br>
+        📈 <strong>Steeper positive</strong> (e.g. m=3): much steeper rise<br>
+        📉 <strong>Negative slope</strong> (e.g. m=−2): goes downhill going right<br>
+        ➡️ <strong>Zero slope</strong> (m=0): flat horizontal line`,
+        visual:`<svg viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:300px;display:block;margin:0 auto">
+  <rect width="280" height="200" fill="rgba(6,182,212,0.05)" rx="12"/>
+  <!-- Axes -->
+  <line x1="20" y1="160" x2="260" y2="160" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+  <line x1="140" y1="10" x2="140" y2="190" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+  <!-- m=1 gentle positive -->
+  <line x1="40" y1="155" x2="240" y2="55" stroke="#22c55e" stroke-width="2.5"/>
+  <text x="245" y="58" fill="#22c55e" font-size="10" font-family="Fredoka One">m=1</text>
+  <!-- m=3 steep positive -->
+  <line x1="100" y1="175" x2="180" y2="15" stroke="#f9e784" stroke-width="2.5"/>
+  <text x="183" y="18" fill="#f9e784" font-size="10" font-family="Fredoka One">m=3</text>
+  <!-- m=-2 negative -->
+  <line x1="40" y1="50" x2="240" y2="150" stroke="#ec4899" stroke-width="2.5"/>
+  <text x="243" y="153" fill="#ec4899" font-size="10" font-family="Fredoka One">m=−2</text>
+  <!-- m=0 horizontal -->
+  <line x1="30" y1="120" x2="200" y2="120" stroke="#06b6d4" stroke-width="2.5"/>
+  <text x="204" y="124" fill="#06b6d4" font-size="10" font-family="Fredoka One">m=0</text>
+</svg>`
+      },
+      {
+        title:"🗺️ Plotting a Line & Writing Equations",
+        body:`<strong>To plot a line from y = mx + b:</strong><br>
+        1. Start at (0, b) on the y-axis<br>
+        2. Use the slope: go right 1, up m (or down if m is negative)<br>
+        3. Plot 2–3 points, then draw the line<br><br>
+        <strong>To write the equation from slope & intercept:</strong><br>
+        If slope = 3 and y-intercept = −2, simply substitute into y = mx + b:<br>
+        y = <strong>3</strong>x + (<strong>−2</strong>) → <span class="highlight">y = 3x − 2</span>`,
+        visual:`<svg viewBox="0 0 260 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:280px;display:block;margin:0 auto">
+  <rect width="260" height="220" fill="rgba(6,182,212,0.05)" rx="12"/>
+  <g stroke="rgba(255,255,255,0.08)" stroke-width="0.5">
+    <line x1="30" y1="40" x2="230" y2="40"/><line x1="30" y1="80" x2="230" y2="80"/>
+    <line x1="30" y1="120" x2="230" y2="120"/><line x1="30" y1="160" x2="230" y2="160"/>
+    <line x1="70" y1="20" x2="70" y2="200"/><line x1="110" y1="20" x2="110" y2="200"/>
+    <line x1="150" y1="20" x2="150" y2="200"/><line x1="190" y1="20" x2="190" y2="200"/>
+  </g>
+  <line x1="30" y1="120" x2="230" y2="120" stroke="#06b6d4" stroke-width="1.5"/>
+  <line x1="110" y1="20" x2="110" y2="200" stroke="#06b6d4" stroke-width="1.5"/>
+  <!-- y = 2x + 1: at x=0 y=1, at x=1 y=3, at x=2 y=5 -->
+  <!-- x=0 → pixel (110,100); x=1 → (150,60); x=2 → (190,20) scale: 40px per unit -->
+  <line x1="50" y1="160" x2="200" y2="10" stroke="#f9e784" stroke-width="2.5"/>
+  <!-- Points -->
+  <circle cx="110" cy="100" r="5" fill="#f9e784"/>
+  <text x="114" y="98" fill="#f9e784" font-size="9" font-family="Fredoka One">(0,1)</text>
+  <circle cx="150" cy="60" r="5" fill="#f9e784"/>
+  <text x="154" y="58" fill="#f9e784" font-size="9" font-family="Fredoka One">(1,3)</text>
+  <circle cx="190" cy="20" r="5" fill="#f9e784"/>
+  <text x="194" y="24" fill="#f9e784" font-size="9" font-family="Fredoka One">(2,5)</text>
+  <!-- slope arrow annotation -->
+  <text x="35" y="190" fill="#fb923c" font-size="9" font-family="Fredoka One">y = 2x + 1</text>
+  <text x="35" y="204" fill="rgba(255,255,255,0.4)" font-size="8">slope=2, y-int=1</text>
+</svg>`
+      }
+    ],
+    practice:[
+      { q:"In y = 3x + 5, what is the slope?", ans:3, opts:[3,5,8,0],
+        hint:"In y = mx + b, m is the slope.\nLook at the number in front of x.",
+        explanation:`<strong>y = mx + b → m is the slope.</strong><br>y = <strong>3</strong>x + 5 → slope = <strong style="color:var(--star)">3 ✅</strong>` },
+      { q:"In y = 3x + 5, what is the y-intercept?", ans:5, opts:[5,3,8,0],
+        hint:"In y = mx + b, b is the y-intercept.\nIt's the number without x.",
+        explanation:`<strong>y = mx + b → b is the y-intercept.</strong><br>y = 3x + <strong>5</strong> → y-intercept = <strong style="color:var(--star)">5 ✅</strong>` },
+      { q:"For y = 2x + 1, what is y when x = 3?", ans:7, opts:[7,9,6,5],
+        hint:"Step 1: Replace x with 3 → y = 2×3 + 1\nStep 2: Multiply → 6 + 1\nStep 3: Add → 7",
+        explanation:`<strong>Substitute x = 3 into y = 2x + 1:</strong><br>y = 2×3 + 1 = 6 + 1 = <strong style="color:var(--star)">7 ✅</strong>` },
+      { q:"Which line has the steepest slope?", ans:"y = 5x + 1", opts:["y = 5x + 1","y = 2x + 3","y = x + 10","y = 3x − 2"],
+        hint:"Compare m values: 5, 2, 1, 3\nLargest absolute value = steepest",
+        explanation:`<strong>Slopes:</strong> 5, 2, 1, 3.<br>Steepest = largest = 5 → <strong style="color:var(--star)">y = 5x + 1 ✅</strong>` },
+      { q:"A line has slope −2 and y-intercept 4. Write its equation.", ans:"y = −2x + 4", opts:["y = −2x + 4","y = 2x + 4","y = −2x − 4","y = 4x − 2"],
+        hint:"Use y = mx + b\nSubstitute m = −2 and b = 4",
+        explanation:`<strong>y = mx + b with m=−2, b=4:</strong><br><strong style="color:var(--star)">y = −2x + 4 ✅</strong>` }
+    ],
+    quiz:[
+      { q:"In y = 4x − 7, what is the slope?", ans:4, opts:[4,-7,0,7] },
+      { q:"In y = 4x − 7, what is the y-intercept?", ans:-7, opts:[-7,4,7,0] },
+      { q:"For y = 3x − 2, what is y when x = 4?", ans:10, opts:[10,14,9,6] },
+      { q:"A positive slope means the line goes...", ans:"Up from left to right", opts:["Up from left to right","Down from left to right","Horizontal","Vertical"] },
+      { q:"A line has slope 3 and y-intercept −1. What is its equation?", ans:"y = 3x − 1", opts:["y = 3x − 1","y = 3x + 1","y = −x + 3","y = x − 3"] }
+    ]
+  },
+
+  9: {
+    title:"Introduction to Quadratics", icon:"🔷",
+    learn:[
+      {
+        title:"🔷 What Makes a Quadratic Special?",
+        body:`So far we've worked with linear equations like y = 2x + 3 — these make straight lines.<br><br>
+        A <strong>quadratic</strong> has an <strong>x²</strong> term (x squared). This makes the graph curve into a beautiful <strong>U-shape</strong> (or upside-down U) called a <strong>parabola</strong>.<br><br>
+        Examples of quadratics:<br>
+        ✅ x² + 5x + 6 = 0<br>
+        ✅ x² − 9 = 0<br>
+        ✅ 2x² + 3x − 2 = 0<br><br>
+        The highest power of x is always 2.`,
+        visual:`<svg viewBox="0 0 260 180" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:280px;display:block;margin:0 auto">
+  <rect width="260" height="180" fill="rgba(124,58,237,0.07)" rx="12"/>
+  <line x1="20" y1="150" x2="240" y2="150" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+  <line x1="130" y1="10" x2="130" y2="170" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+  <!-- Parabola y=x^2 centred at (130,150), scale 18px/unit -->
+  <path d="M 40,150 Q 130,10 220,150" stroke="#a78bfa" stroke-width="3" fill="none"/>
+  <text x="225" y="148" fill="#a78bfa" font-size="10" font-family="Fredoka One">y=x²</text>
+  <text x="100" y="175" fill="rgba(255,255,255,0.4)" font-size="9">U-shape = parabola</text>
+  <!-- vertex dot -->
+  <circle cx="130" cy="30" r="5" fill="#f9e784"/>
+  <text x="135" y="28" fill="#f9e784" font-size="9" font-family="Fredoka One">vertex</text>
+</svg>`
+      },
+      {
+        title:"🔍 x² — What Does it Mean?",
+        body:`Before solving quadratics, let's make sure we understand x².<br><br>
+        <strong>x² simply means x × x</strong> — the number multiplied by itself.<br><br>
+        Examples:<br>
+        • If x = 2: x² = 2 × 2 = <strong>4</strong><br>
+        • If x = 3: x² = 3 × 3 = <strong>9</strong><br>
+        • If x = 5: x² = 5 × 5 = <strong>25</strong><br>
+        • If x = −3: x² = (−3) × (−3) = <strong>9</strong> (negatives cancel!)<br><br>
+        This is why quadratics often have <em>two</em> solutions — both a positive and a negative value can square to give the same result!`,
+        visual:`<div class="visual-box"><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><div style="background:rgba(167,139,250,.2);border-radius:12px;padding:10px 14px;text-align:center"><div style="font-size:1.2rem;color:#a78bfa">x = 3</div><div style="color:var(--muted);font-size:.85rem">x² = 3×3</div><div style="color:var(--star);font-weight:700">= 9</div></div><div style="background:rgba(244,114,182,.2);border-radius:12px;padding:10px 14px;text-align:center"><div style="font-size:1.2rem;color:#f472b6">x = −3</div><div style="color:var(--muted);font-size:.85rem">x² = (−3)×(−3)</div><div style="color:var(--star);font-weight:700">= 9 too!</div></div></div><p style="color:var(--muted);font-size:.88rem;margin-top:10px">So x² = 9 has TWO answers: x = 3 and x = −3</p></div>`
+      },
+      {
+        title:"🔧 Factorising Quadratics",
+        body:`To solve x² + bx + c = 0, we try to <strong>factorise</strong> — rewrite it as two brackets multiplied together.<br><br>
+        We look for two numbers <strong>p</strong> and <strong>q</strong> such that:<br>
+        • p × q = c (they multiply to give the constant)<br>
+        • p + q = b (they add to give the x coefficient)<br><br>
+        Example: x² + 5x + 6<br>
+        Find two numbers that multiply to <strong>6</strong> AND add to <strong>5</strong>:<br>
+        Try: 2 × 3 = 6 ✅ and 2 + 3 = 5 ✅<br>
+        So: <strong>(x + 2)(x + 3)</strong>`,
+        visual:`<div class="visual-box"><div class="equation-box" style="font-size:1.2rem">x² + 5x + 6 = 0</div><div style="margin:10px 0;color:var(--muted)">Find p and q: p×q = 6, p+q = 5</div><div style="margin:8px 0;color:var(--muted)">2 × 3 = 6 ✅ and 2 + 3 = 5 ✅</div><div class="equation-box" style="font-size:1.2rem;color:var(--star)">(x + 2)(x + 3) = 0</div></div>`
+      },
+      {
+        title:"🎯 Finding the Solutions (Roots)",
+        body:`Once factorised, use the <strong>zero product rule</strong>:<br>
+        If A × B = 0, then either A = 0 OR B = 0.<br><br>
+        (x + 2)(x + 3) = 0<br><br>
+        Either: x + 2 = 0 → <strong>x = −2</strong><br>
+        Or: &nbsp;&nbsp;&nbsp;&nbsp; x + 3 = 0 → <strong>x = −3</strong><br><br>
+        These two values are called the <strong>roots</strong> of the quadratic. You can always check by substituting back in!`,
+        visual:`<div class="visual-box"><div class="equation-box" style="font-size:1.2rem">(x + 2)(x + 3) = 0<br>x + 2 = 0 → <span style="color:var(--star)">x = −2</span><br>x + 3 = 0 → <span style="color:var(--teal)">x = −3</span></div><p style="color:var(--muted);margin-top:8px">Check: (−2)² + 5(−2) + 6 = 4−10+6 = 0 ✅</p></div>`
+      }
+    ],
+    practice:[
+      { q:"What is x² when x = 4?", ans:16, opts:[16,8,12,20],
+        hint:"Step 1: x² means x × x\nStep 2: 4 × 4 = 16",
+        explanation:`<strong>x² = x × x.</strong><br>4 × 4 = <strong style="color:var(--star)">16 ✅</strong>` },
+      { q:"Which pair multiplies to 8 AND adds to 6?", ans:"2 and 4", opts:["2 and 4","1 and 8","3 and 3","4 and 4"],
+        hint:"Step 1: List pairs that multiply to 8: (1,8), (2,4)\nStep 2: Check which pair adds to 6: 2+4=6 ✅",
+        explanation:`<strong>Need p×q=8 and p+q=6:</strong><br>1×8=8 but 1+8=9 ❌<br>2×4=8 and 2+4=6 ✅<br><strong style="color:var(--star)">2 and 4 ✅</strong>` },
+      { q:"Factorise: x² + 6x + 8", ans:"(x+2)(x+4)", opts:["(x+2)(x+4)","(x+1)(x+8)","(x+3)(x+3)","(x+6)(x+2)"],
+        hint:"Step 1: Find p and q: p×q=8 and p+q=6\nStep 2: 2×4=8 and 2+4=6 ✅\nStep 3: (x+2)(x+4)",
+        explanation:`<strong>Factorise x² + 6x + 8:</strong><br>p×q=8, p+q=6 → p=2, q=4<br><strong style="color:var(--star)">(x+2)(x+4) ✅</strong>` },
+      { q:"If (x+2)(x+4)=0, one solution is x=−2. What is the other?", ans:"x = −4", opts:["x = −4","x = 4","x = 2","x = −6"],
+        hint:"Step 1: Set the other bracket to zero: x + 4 = 0\nStep 2: Solve: x = −4",
+        explanation:`<strong>Zero product rule:</strong><br>x + 4 = 0 → <strong style="color:var(--star)">x = −4 ✅</strong>` },
+      { q:"Solve: x² + 7x + 12 = 0. What are the solutions?", ans:"x=−3 and x=−4", opts:["x=−3 and x=−4","x=3 and x=4","x=−3 and x=4","x=−6 and x=−2"],
+        hint:"Step 1: Find p×q=12 and p+q=7\nStep 2: 3×4=12 and 3+4=7 ✅\nStep 3: (x+3)(x+4)=0 → x=−3 or x=−4",
+        explanation:`<strong>Factorise x² + 7x + 12:</strong><br>3×4=12 and 3+4=7 ✅<br>(x+3)(x+4)=0<br><strong style="color:var(--star)">x=−3 and x=−4 ✅</strong>` }
+    ],
+    quiz:[
+      { q:"What is x² when x = 5?", ans:25, opts:[25,10,15,20] },
+      { q:"Which pair multiplies to 12 AND adds to 7?", ans:"3 and 4", opts:["3 and 4","2 and 6","1 and 12","4 and 4"] },
+      { q:"Factorise: x² + 5x + 4", ans:"(x+1)(x+4)", opts:["(x+1)(x+4)","(x+2)(x+3)","(x+4)(x+4)","(x+5)(x+1)"] },
+      { q:"If (x+1)(x+4)=0, what are the solutions?", ans:"x=−1 and x=−4", opts:["x=−1 and x=−4","x=1 and x=4","x=−1 and x=4","x=1 and x=−4"] },
+      { q:"A quadratic graph is shaped like a...", ans:"Parabola (U shape)", opts:["Parabola (U shape)","Straight line","Circle","Triangle"] }
     ]
   }
 };
@@ -1105,16 +1504,14 @@ function goHome(){
 function updateHomeUI(){
   const total=Object.values(state.levelStars).reduce((a,b)=>a+b,0);
   document.getElementById('total-stars-home').textContent=total;
-  const maxPossible=15;
+  const maxPossible=45;
   document.getElementById('progress-bar').style.width=(total/maxPossible*100)+'%';
-
-  for(let lvl=1;lvl<=3;lvl++){
+  for(let lvl=1;lvl<=9;lvl++){
     const st=state.levelStars[lvl]||0;
-    document.getElementById(`lc${lvl}-stars`).textContent='⭐'.repeat(st)+'☆'.repeat(Math.max(0,5-st));
+    const el=document.getElementById(`lc${lvl}-stars`);
+    if(el) el.textContent='⭐'.repeat(st)+'☆'.repeat(Math.max(0,5-st));
     const card=document.getElementById(`lc-${lvl}`);
-    if(state.unlockedLevels.includes(lvl)){
-      card.classList.remove('locked');
-    }
+    if(card && state.unlockedLevels.includes(lvl)) card.classList.remove('locked');
   }
 }
 
@@ -1145,9 +1542,7 @@ function renderLearnPage(idx){
   const lvl=curriculum[state.currentLevel];
   const page=lvl.learn[idx];
   state.learnPage=idx;
-
   const nav=lvl.learn.map((_,i)=>`<span style="width:10px;height:10px;border-radius:50%;background:${i===idx?'var(--teal)':'rgba(255,255,255,.2)'};display:inline-block;margin:0 4px;cursor:pointer" onclick="renderLearnPage(${i})"></span>`).join('');
-
   document.getElementById('learn-content').innerHTML=`
     <div class="card" style="animation-delay:.1s">
       <h2>${page.title}</h2>
@@ -1156,10 +1551,10 @@ function renderLearnPage(idx){
     </div>
     <div style="text-align:center;margin:8px 0">${nav}</div>
     <div class="btn-row" style="margin-top:0">
-      ${idx>0?`<button class="btn btn-teal" onclick="renderLearnPage(${idx-1})">← Back</button>`:''}
+      ${idx>0?`<button class="btn btn-teal" onclick="renderLearnPage(${idx-1})">← Back</button>`:'<button class="btn" style="background:rgba(255,255,255,.07);color:var(--muted)" onclick="goHome()">🏠 Home</button>'}
       ${idx<lvl.learn.length-1
         ?`<button class="btn btn-primary" onclick="renderLearnPage(${idx+1})">Next ➜</button>`
-        :`<button class="btn btn-success" onclick="showExamples()">Practice! ➜</button>`
+        :`<button class="btn btn-success" onclick="showExamples()">Let\'s Practice! ➜</button>`
       }
     </div>
   `;
@@ -1172,6 +1567,7 @@ function showExamples(){
   state.practiceProbIdx=0;
   state.practiceScore=0;
   state.practiceAttempted=false;
+  state.practiceShuffled=null;
   showScreen('practice');
   renderPractice();
 }
@@ -1182,13 +1578,23 @@ function renderPractice(){
   const idx=state.practiceProbIdx;
 
   if(idx>=problems.length){
-    showFeedback('🎉 Practice complete! Take the quiz!','correct-fb');
-    setTimeout(()=>startQuiz(),1200);
+    // All done — offer redo lesson or start quiz
+    document.getElementById('practice-title').textContent='Practice Complete! 🎉';
+    document.getElementById('practice-content').innerHTML=`
+      <div class="card" style="text-align:center">
+        <div style="font-size:3rem;margin-bottom:10px">🌟</div>
+        <h2 style="color:var(--green)">Great Work!</h2>
+        <p style="margin:12px 0;color:#d0d0ee">You've finished all the practice questions for this level.<br>What would you like to do next?</p>
+        <div class="btn-row" style="flex-direction:column;gap:12px;margin-top:16px">
+          <button class="btn btn-teal" onclick="showLearn()">📖 Review the Lesson Again</button>
+          <button class="btn btn-success" onclick="startQuiz()">🎯 Take the Quiz!</button>
+        </div>
+      </div>
+    `;
     return;
   }
 
   const prob=problems[idx];
-  // Shuffle options but keep stable during retries using stored order
   if(!state.practiceShuffled || state.practiceShuffled.idx !== idx){
     state.practiceShuffled={ idx, opts:[...prob.opts].sort(()=>Math.random()-.5) };
   }
@@ -1200,21 +1606,38 @@ function renderPractice(){
     <div class="card" id="practice-card">
       <h2>❓ Question ${idx+1}</h2>
       <div class="equation-box">${prob.q}</div>
-      <p style="color:var(--muted);font-size:.9rem;margin-bottom:8px">💡 Hint: ${prob.hint}</p>
-      <div class="options-grid" id="opts-grid">
-        ${shuffled.map(o=>`<button class="opt-btn" onclick="checkPractice(this, ${JSON.stringify(o)}, ${JSON.stringify(prob.ans)})">${o}</button>`).join('')}
+      <div style="text-align:right;margin-bottom:8px">
+        <button class="btn-hint" id="hint-btn" onclick="showHint()">💡 Show Hint</button>
+      </div>
+      <div id="hint-area"></div>
+      <div class="options-grid" id="opts-grid" data-correct="${String(prob.ans).replace(/"/g,'&quot;')}">
+        ${shuffled.map(o=>`<button class="opt-btn" data-val="${String(o).replace(/"/g,'&quot;')}" onclick="checkPractice(this)">${o}</button>`).join('')}
       </div>
       <div id="prac-explain"></div>
     </div>
   `;
+  // Store hint lines for the showHint function
+  window._currentHint = prob.hint;
 }
 
-function checkPractice(el, chosen, correct){
-  // After a wrong attempt, only the correct button remains clickable
-  const btns=document.querySelectorAll('#opts-grid .opt-btn');
+function showHint(){
+  const hintLines = (window._currentHint||'').split('\n').filter(Boolean);
+  document.getElementById('hint-area').innerHTML=`
+    <div style="background:rgba(249,231,132,.1);border:1px solid rgba(249,231,132,.3);border-radius:12px;padding:12px 14px;margin-bottom:10px;font-size:.93rem;color:#fde68a;line-height:1.7">
+      💡 <strong>Hint:</strong><br>${hintLines.map(l=>`• ${l}`).join('<br>')}
+    </div>
+  `;
+  document.getElementById('hint-btn').disabled=true;
+  document.getElementById('hint-btn').textContent='💡 Hint shown';
+}
+
+function checkPractice(el){
+  const grid = document.getElementById('opts-grid');
+  const correct = grid.dataset.correct;
+  const chosen = el.dataset.val;
+  const btns = document.querySelectorAll('#opts-grid .opt-btn');
 
   if(String(chosen)===String(correct)){
-    // Correct!
     btns.forEach(b=>b.disabled=true);
     el.classList.add('correct');
     showFeedback('✅ Correct! Well done! 🌟','correct-fb');
@@ -1226,16 +1649,11 @@ function checkPractice(el, chosen, correct){
       renderPractice();
     },1300);
   } else {
-    // Wrong answer — show explanation, disable wrong buttons, keep correct one active
-    if(state.practiceAttempted) return; // already shown explanation, ignore extra wrong clicks
+    if(state.practiceAttempted) return;
     state.practiceAttempted=true;
-
     el.classList.add('wrong');
     showFeedback('❌ Not quite — read below and try again!','wrong-fb');
-
-    // Disable ALL buttons first
     btns.forEach(b=>b.disabled=true);
-
     const prob=curriculum[state.currentLevel].practice[state.practiceProbIdx];
     document.getElementById('prac-explain').innerHTML=`
       <div class="explain-panel">
@@ -1246,16 +1664,12 @@ function checkPractice(el, chosen, correct){
         </div>
       </div>
     `;
-
-    // After a short delay, re-enable ONLY the correct button so kid must click it
     setTimeout(()=>{
       btns.forEach(b=>{
-        const val=b.textContent.trim();
-        if(String(val)===String(correct)){
+        if(String(b.dataset.val)===String(correct)){
           b.disabled=false;
           b.style.animation='varPulse 1s ease-in-out infinite alternate';
         }
-        // leave wrong buttons disabled
       });
     }, 600);
   }
@@ -1274,7 +1688,6 @@ function startQuiz(){
 
 function renderQuizDots(){
   const lvl=curriculum[state.currentLevel];
-  const total=lvl.quiz.length;
   const dots=document.getElementById('quiz-dots');
   dots.innerHTML=lvl.quiz.map((_,i)=>{
     let cls='quiz-dot';
@@ -1288,35 +1701,31 @@ function renderQuizQuestion(){
   const lvl=curriculum[state.currentLevel];
   const questions=lvl.quiz;
   renderQuizDots();
-
-  if(state.quizIdx>=questions.length){
-    finishQuiz(); return;
-  }
-
+  if(state.quizIdx>=questions.length){ finishQuiz(); return; }
   const q=questions[state.quizIdx];
   const shuffled=[...q.opts].sort(()=>Math.random()-.5);
-
   document.getElementById('quiz-content').innerHTML=`
     <div class="card">
       <h2>Question ${state.quizIdx+1} of ${questions.length}</h2>
       <div class="equation-box">${q.q}</div>
-      <div class="options-grid" id="quiz-opts">
-        ${shuffled.map(o=>`<button class="opt-btn" onclick="checkQuiz(this, '${o}', '${q.ans}')">${o}</button>`).join('')}
+      <div class="options-grid" id="quiz-opts" data-correct="${String(q.ans).replace(/"/g,'&quot;')}">
+        ${shuffled.map(o=>`<button class="opt-btn" data-val="${String(o).replace(/"/g,'&quot;')}" onclick="checkQuiz(this)">${o}</button>`).join('')}
       </div>
       <div id="quiz-feedback-area"></div>
     </div>
   `;
 }
 
-function checkQuiz(el, chosen, correct){
+function checkQuiz(el){
+  const grid=document.getElementById('quiz-opts');
+  const correct=grid.dataset.correct;
+  const chosen=el.dataset.val;
   const btns=document.querySelectorAll('#quiz-opts .opt-btn');
   btns.forEach(b=>b.disabled=true);
-
   const isCorrect=String(chosen)===String(correct);
   if(isCorrect){
     el.classList.add('correct');
     state.quizCorrect++;
-    // Show a quick correct panel then auto-advance
     document.getElementById('quiz-feedback-area').innerHTML=`
       <div class="quiz-reveal" style="border-color:rgba(34,197,94,.4);background:linear-gradient(135deg,rgba(34,197,94,.12),rgba(16,185,129,.08));color:#bbf7d0">
         <strong style="color:#4ade80">✅ Correct! Great job!</strong>
@@ -1324,10 +1733,8 @@ function checkQuiz(el, chosen, correct){
       </div>`;
   } else {
     el.classList.add('wrong');
-    // Highlight correct answer
-    btns.forEach(b=>{ if(String(b.textContent.trim())===String(correct)) b.classList.add('correct'); });
+    btns.forEach(b=>{ if(String(b.dataset.val)===String(correct)) b.classList.add('correct'); });
     state.quizWrong.push(state.quizIdx);
-    // Show what the correct answer was + Next button — no auto-advance
     document.getElementById('quiz-feedback-area').innerHTML=`
       <div class="quiz-reveal">
         <strong>❌ Not quite!</strong> The correct answer was <strong style="color:var(--star)">${correct}</strong>.<br>
@@ -1356,7 +1763,7 @@ function skipGameFromIntro(){
   document.getElementById('game-intro-modal').classList.remove('show');
   state.crushBonus=0;
   const lvl=state.currentLevel;
-  if(lvl<3 && !state.unlockedLevels.includes(lvl+1)){
+  if(lvl<9 && !state.unlockedLevels.includes(lvl+1)){
     state.unlockedLevels.push(lvl+1);
   }
   showWin();
@@ -1365,21 +1772,13 @@ function skipGameFromIntro(){
 /* ── GLOBAL NAV ── */
 function showGlobalNav(){ document.getElementById('global-nav').classList.remove('hidden'); }
 function hideGlobalNav(){ document.getElementById('global-nav').classList.add('hidden'); }
-
-function navHome(){
-  // Save current position so they can resume later
-  updateHomeUI();
-  showScreen('home');
-  hideGlobalNav();
-}
+function navHome(){ updateHomeUI(); showScreen('home'); }
 
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-'+id).classList.add('active');
   window.scrollTo(0,0);
-  // Show global nav on all screens except home
-  if(id==='home') hideGlobalNav();
-  else showGlobalNav();
+  if(id==='home') hideGlobalNav(); else showGlobalNav();
 }
 
 function pauseQuiz(){
@@ -1389,21 +1788,9 @@ function pauseQuiz(){
     `Question ${state.quizIdx+1} of ${total} • ${state.quizCorrect} correct so far`;
   document.getElementById('quiz-pause-modal').classList.add('show');
 }
-
-function resumeQuiz(){
-  document.getElementById('quiz-pause-modal').classList.remove('show');
-}
-
-function pauseGoReview(){
-  document.getElementById('quiz-pause-modal').classList.remove('show');
-  showLearn();
-}
-
-function pauseGoHome(){
-  document.getElementById('quiz-pause-modal').classList.remove('show');
-  updateHomeUI();
-  showScreen('home');
-}
+function resumeQuiz(){ document.getElementById('quiz-pause-modal').classList.remove('show'); }
+function pauseGoReview(){ document.getElementById('quiz-pause-modal').classList.remove('show'); showLearn(); }
+function pauseGoHome(){ document.getElementById('quiz-pause-modal').classList.remove('show'); updateHomeUI(); showScreen('home'); }
 
 function finishQuiz(){
   const lvl=curriculum[state.currentLevel];
@@ -1411,15 +1798,11 @@ function finishQuiz(){
   const correct=state.quizCorrect;
   const wrong=total-correct;
   const pct=correct/total;
-
-  let stars = pct>=1?5:pct>=.8?4:pct>=.6?3:pct>=.4?2:1;
+  let stars=pct>=1?5:pct>=.8?4:pct>=.6?3:pct>=.4?2:1;
   state.levelStars[state.currentLevel]=Math.max(state.levelStars[state.currentLevel]||0,stars);
   updateHomeUI();
-
   const passed=pct>=.6;
   const grade=pct>=1?'Perfect! 🌟':pct>=.8?'Excellent! 🎉':pct>=.6?'Well done! ✅':pct>=.4?'Almost there! 💪':'Keep practising! 📖';
-
-  // Build a per-question summary
   const questions=lvl.quiz;
   const summaryRows=questions.map((q,i)=>{
     const wasWrong=state.quizWrong.includes(i);
@@ -1428,12 +1811,10 @@ function finishQuiz(){
       <span style="font-size:.9rem;color:${wasWrong?'#fca5a5':'#86efac'}">${q.q}</span>
     </div>`;
   }).join('');
-
   document.getElementById('quiz-dots').innerHTML='';
   document.getElementById('quiz-content').innerHTML=`
     <div class="card" style="text-align:center;max-width:600px">
       <h2 style="color:${passed?'var(--green)':'var(--orange)'}">Quiz Complete! ${grade}</h2>
-
       <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin:16px 0">
         <div style="background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.35);border-radius:14px;padding:14px 22px">
           <div style="font-family:'Fredoka One',cursive;font-size:2rem;color:#4ade80">${correct}</div>
@@ -1448,23 +1829,21 @@ function finishQuiz(){
           <div style="font-size:.85rem;color:var(--muted)">Score</div>
         </div>
       </div>
-
       <div style="text-align:left;margin:14px 0;padding:0 4px">
         <div style="font-family:'Fredoka One',cursive;color:var(--teal);margin-bottom:8px">Question Summary:</div>
         ${summaryRows}
       </div>
-
       ${passed
-        ? `<p style="color:#86efac;margin:12px 0">🎉 You passed! You've unlocked <strong>Star Blast</strong> as a reward!</p>
-           <div class="btn-row">
-             <button class="btn btn-primary" onclick="startQuiz()">🔄 Retake Quiz</button>
-             <button class="btn btn-success" onclick="showGameIntro()">🍬 Claim Reward ➜</button>
-           </div>`
-        : `<p style="color:#fca5a5;margin:12px 0">You need <strong>3/5</strong> to pass. Review the lesson and give it another go!</p>
-           <div class="btn-row">
-             <button class="btn btn-teal" onclick="showLearn()">📖 Review Lesson</button>
-             <button class="btn btn-primary" onclick="startQuiz()">🔄 Retake Quiz</button>
-           </div>`
+        ?`<p style="color:#86efac;margin:12px 0">🎉 You passed! You've unlocked <strong>Star Blast</strong> as a reward!</p>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="startQuiz()">🔄 Retake Quiz</button>
+            <button class="btn btn-success" onclick="showGameIntro()">🍬 Claim Reward ➜</button>
+          </div>`
+        :`<p style="color:#fca5a5;margin:12px 0">You need <strong>3/5</strong> to pass. Review the lesson and give it another go!</p>
+          <div class="btn-row">
+            <button class="btn btn-teal" onclick="showLearn()">📖 Review Lesson</button>
+            <button class="btn btn-primary" onclick="startQuiz()">🔄 Retake Quiz</button>
+          </div>`
       }
     </div>
   `;
@@ -1485,8 +1864,6 @@ function startCrush(){
   document.getElementById('crush-score').textContent='0';
   document.getElementById('crush-moves').textContent=crushMovesLeft;
   document.getElementById('crush-msg').textContent='';
-  document.getElementById('crush-continue').style.display='none';
-
   initCrushBoard();
   showScreen('crush');
 }
@@ -1495,19 +1872,47 @@ function initCrushBoard(){
   crushBoard=[];
   for(let r=0;r<ROWS;r++){
     crushBoard.push([]);
-    for(let c=0;c<COLS;c++){
-      crushBoard[r].push(randGem());
-    }
+    for(let c=0;c<COLS;c++) crushBoard[r].push(randGem());
   }
-  // ensure no initial matches
+  for(let r=0;r<ROWS;r++)
+    for(let c=0;c<COLS;c++)
+      while(hasMatchAt(r,c)) crushBoard[r][c]=randGem();
+  // Ensure at least one valid move exists
+  if(!hasAnyValidMove()) shuffleBoard();
+  renderCrushBoard();
+}
+
+function hasAnyValidMove(){
+  // Check if any swap produces a match
   for(let r=0;r<ROWS;r++){
     for(let c=0;c<COLS;c++){
-      while(hasMatchAt(r,c)){
-        crushBoard[r][c]=randGem();
+      // Try swap right
+      if(c+1<COLS){
+        const t=crushBoard[r][c]; crushBoard[r][c]=crushBoard[r][c+1]; crushBoard[r][c+1]=t;
+        const m=findMatches().length>0;
+        const t2=crushBoard[r][c]; crushBoard[r][c]=crushBoard[r][c+1]; crushBoard[r][c+1]=t2;
+        if(m) return true;
+      }
+      // Try swap down
+      if(r+1<ROWS){
+        const t=crushBoard[r][c]; crushBoard[r][c]=crushBoard[r+1][c]; crushBoard[r+1][c]=t;
+        const m=findMatches().length>0;
+        const t2=crushBoard[r][c]; crushBoard[r][c]=crushBoard[r+1][c]; crushBoard[r+1][c]=t2;
+        if(m) return true;
       }
     }
   }
-  renderCrushBoard();
+  return false;
+}
+
+function shuffleBoard(){
+  // Shuffle all gems and re-check
+  for(let r=0;r<ROWS;r++)
+    for(let c=0;c<COLS;c++)
+      crushBoard[r][c]=randGem();
+  for(let r=0;r<ROWS;r++)
+    for(let c=0;c<COLS;c++)
+      while(hasMatchAt(r,c)) crushBoard[r][c]=randGem();
 }
 
 function randGem(){ return GEMS[Math.floor(Math.random()*GEMS.length)]; }
@@ -1539,13 +1944,10 @@ function renderCrushBoard(){
   }
 }
 
-function getCrushCell(r,c){
-  return document.querySelector(`#crush-board .crush-cell[data-r="${r}"][data-c="${c}"]`);
-}
+function getCrushCell(r,c){ return document.querySelector(`#crush-board .crush-cell[data-r="${r}"][data-c="${c}"]`); }
 
 function onCrushClick(r,c){
   if(crushAnimating||crushMovesLeft<=0||!crushBoard[r][c]) return;
-
   if(crushSelected===null){
     crushSelected={r,c};
     getCrushCell(r,c).classList.add('selected');
@@ -1553,22 +1955,18 @@ function onCrushClick(r,c){
     const prev=crushSelected;
     getCrushCell(prev.r,prev.c).classList.remove('selected');
     crushSelected=null;
-
     const dr=Math.abs(r-prev.r), dc=Math.abs(c-prev.c);
     if((dr===1&&dc===0)||(dr===0&&dc===1)){
-      // swap
       const tmp=crushBoard[r][c];
       crushBoard[r][c]=crushBoard[prev.r][prev.c];
       crushBoard[prev.r][prev.c]=tmp;
       renderCrushBoard();
-
       const matches=findMatches();
       if(matches.length>0){
         crushMovesLeft--;
         document.getElementById('crush-moves').textContent=crushMovesLeft;
         processMatches(matches);
       } else {
-        // swap back
         const t=crushBoard[r][c];
         crushBoard[r][c]=crushBoard[prev.r][prev.c];
         crushBoard[prev.r][prev.c]=t;
@@ -1576,7 +1974,6 @@ function onCrushClick(r,c){
         showFeedback('No match there! Try again 😅','wrong-fb');
       }
     } else {
-      // re-select
       crushSelected={r,c};
       getCrushCell(r,c).classList.add('selected');
     }
@@ -1585,7 +1982,7 @@ function onCrushClick(r,c){
 
 function findMatches(){
   const matched=new Set();
-  for(let r=0;r<ROWS;r++){
+  for(let r=0;r<ROWS;r++)
     for(let c=0;c<COLS-2;c++){
       const g=crushBoard[r][c];
       if(g&&crushBoard[r][c+1]===g&&crushBoard[r][c+2]===g){
@@ -1593,8 +1990,7 @@ function findMatches(){
         if(c+3<COLS&&crushBoard[r][c+3]===g) matched.add(`${r},${c+3}`);
       }
     }
-  }
-  for(let c=0;c<COLS;c++){
+  for(let c=0;c<COLS;c++)
     for(let r=0;r<ROWS-2;r++){
       const g=crushBoard[r][c];
       if(g&&crushBoard[r+1][c]===g&&crushBoard[r+2][c]===g){
@@ -1602,73 +1998,66 @@ function findMatches(){
         if(r+3<ROWS&&crushBoard[r+3][c]===g) matched.add(`${r+3},${c}`);
       }
     }
-  }
   return [...matched].map(k=>{ const[r,c]=k.split(','); return{r:+r,c:+c}; });
 }
 
 async function processMatches(matches){
   crushAnimating=true;
-
-  // animate matched cells
-  matches.forEach(({r,c})=>{
-    const cell=getCrushCell(r,c);
-    if(cell) cell.classList.add('matched');
-  });
-
+  matches.forEach(({r,c})=>{ const cell=getCrushCell(r,c); if(cell) cell.classList.add('matched'); });
   const pts=matches.length*10;
   crushGameScore+=pts;
   document.getElementById('crush-score').textContent=crushGameScore;
-  document.getElementById('crush-msg').textContent=`+${pts} stars! 🌟`;
-
+  document.getElementById('crush-msg').textContent=`+${pts} ⭐`;
   await sleep(400);
-
-  // remove matched
   matches.forEach(({r,c})=>{ crushBoard[r][c]=null; });
-
-  // gravity
   for(let c=0;c<COLS;c++){
     let empty=ROWS-1;
     for(let r=ROWS-1;r>=0;r--){
-      if(crushBoard[r][c]!==null){
-        crushBoard[empty][c]=crushBoard[r][c];
-        if(empty!==r) crushBoard[r][c]=null;
-        empty--;
-      }
+      if(crushBoard[r][c]!==null){ crushBoard[empty][c]=crushBoard[r][c]; if(empty!==r) crushBoard[r][c]=null; empty--; }
     }
-    for(let r=empty;r>=0;r--){ crushBoard[r][c]=randGem(); }
+    for(let r=empty;r>=0;r--) crushBoard[r][c]=randGem();
   }
-
   renderCrushBoard();
-
   await sleep(300);
   const newMatches=findMatches();
-  if(newMatches.length>0){
-    await processMatches(newMatches);
-    return;
+  if(newMatches.length>0){ await processMatches(newMatches); return; }
+  crushAnimating=false;
+
+  // After settling, check for no valid moves
+  if(!hasAnyValidMove() && crushMovesLeft>0){
+    document.getElementById('crush-msg').textContent='No more moves! Reshuffling... 🔀';
+    await sleep(1000);
+    shuffleBoard();
+    renderCrushBoard();
+    document.getElementById('crush-msg').textContent='Board reshuffled — keep going!';
+    await sleep(800);
+    document.getElementById('crush-msg').textContent='';
   }
 
-  crushAnimating=false;
   checkCrushEnd();
 }
 
 function checkCrushEnd(){
   if(crushMovesLeft<=0){
     state.crushBonus=Math.floor(crushGameScore/50);
-    document.getElementById('crush-msg').textContent=`Game over! Bonus stars: +${state.crushBonus} ⭐`;
-    document.getElementById('crush-continue').style.display='inline-block';
+    const bonusMsg=state.crushBonus>0
+      ?`Amazing — you earned <strong style="color:var(--star)">${state.crushBonus} bonus ⭐</strong> stars!`
+      :`Keep practising to earn bonus stars next time!`;
+    document.getElementById('go-total-score').textContent=crushGameScore;
+    document.getElementById('go-bonus-stars').textContent=state.crushBonus+' ⭐';
+    document.getElementById('go-bonus-msg').innerHTML=bonusMsg;
+    document.getElementById('game-over-modal').classList.add('show');
   }
 }
+
+function closeGameOver(){ document.getElementById('game-over-modal').classList.remove('show'); afterCrush(); }
+function replayCrush(){ document.getElementById('game-over-modal').classList.remove('show'); startCrush(); }
 
 function afterCrush(){
   const lvl=state.currentLevel;
   const bonus=state.crushBonus||0;
   state.levelStars[lvl]=Math.min(5,(state.levelStars[lvl]||0)+bonus);
-
-  // unlock next level
-  if(lvl<3 && !state.unlockedLevels.includes(lvl+1)){
-    state.unlockedLevels.push(lvl+1);
-  }
-
+  if(lvl<9 && !state.unlockedLevels.includes(lvl+1)) state.unlockedLevels.push(lvl+1);
   showWin();
 }
 
@@ -1681,33 +2070,21 @@ function showWin(){
   const lvl=state.currentLevel;
   const stars=state.levelStars[lvl]||0;
   const bonus=state.crushBonus||0;
-
-  // animate stars
+  const allUnlocked=state.unlockedLevels.length>=9;
   const row=document.getElementById('win-stars-row');
-  row.innerHTML='⭐⭐⭐⭐⭐'.split('').map((s,i)=>`<span class="star-icon" id="ws${i}">⭐</span>`).join('');
-
+  row.innerHTML=[0,1,2,3,4].map(i=>`<span class="star-icon" id="ws${i}">⭐</span>`).join('');
   document.getElementById('win-msg').innerHTML=`
     You got <strong style="color:var(--star)">${stars} stars</strong> on Level ${lvl}!
     ${bonus>0?`<br><span style="color:var(--teal)">+${bonus} bonus stars from Star Blast!</span>`:''}
-    ${lvl<3?'<br>Level '+(lvl+1)+' is now unlocked! 🎉':'<br>You\'ve completed all levels! You\'re an Algebra Star! 🌟'}
+    ${lvl<9?'':'<br>You\'ve completed ALL 9 levels! You\'re an Algebra Master! 🌟🏆'}
   `;
-
-  document.getElementById('btn-next-level').style.display=lvl<3?'inline-block':'none';
-
+  document.getElementById('btn-next-level').style.display=lvl<9?'inline-block':'none';
   showScreen('win');
   launchConfetti();
-
-  // light stars one by one
-  for(let i=0;i<5;i++){
-    setTimeout(()=>{
-      if(i<stars) document.getElementById('ws'+i).classList.add('lit');
-    }, 200+(i*250));
-  }
+  for(let i=0;i<5;i++) setTimeout(()=>{ if(i<stars) document.getElementById('ws'+i).classList.add('lit'); }, 200+(i*250));
 }
 
-function goNextLevel(){
-  startLevel(state.currentLevel+1);
-}
+function goNextLevel(){ startLevel(state.currentLevel+1); }
 
 /* ═══════════════════════════════════════
    CONFETTI
@@ -1717,20 +2094,8 @@ function launchConfetti(){
   for(let i=0;i<60;i++){
     const el=document.createElement('div');
     el.className='confetti-piece';
-    const angle=Math.random()*360;
-    const dist=150+Math.random()*300;
-    el.style.cssText=`
-      left:${40+Math.random()*20}%;
-      top:20%;
-      background:${colors[Math.floor(Math.random()*colors.length)]};
-      border-radius:${Math.random()>.5?'50%':'2px'};
-      width:${6+Math.random()*8}px;
-      height:${6+Math.random()*8}px;
-      --cx:${Math.cos(angle)*dist}px;
-      --cy:${Math.sin(angle)*dist+200}px;
-      --cd:${1.5+Math.random()*2}s;
-      animation-delay:${Math.random()*.5}s;
-    `;
+    const angle=Math.random()*360, dist=150+Math.random()*300;
+    el.style.cssText=`left:${40+Math.random()*20}%;top:20%;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:${Math.random()>.5?'50%':'2px'};width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;--cx:${Math.cos(angle)*dist}px;--cy:${Math.sin(angle)*dist+200}px;--cd:${1.5+Math.random()*2}s;animation-delay:${Math.random()*.5}s;`;
     document.body.appendChild(el);
     setTimeout(()=>el.remove(), 3500);
   }
@@ -1752,6 +2117,7 @@ function showFeedback(msg,cls){
    INIT
 ════════════════════════════════════════*/
 updateHomeUI();
+
 </script>
 </body>
 </html>
